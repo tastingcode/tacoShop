@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import java.util.function.Function;
 
@@ -153,4 +150,51 @@ public class UserV1ApiE2ETest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 포인트 조회
+     * - [x]  포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.
+     * - [x]  `X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.
+     */
+    @DisplayName("GET /api/v1/users/points")
+    @Nested
+    class FindPoint{
+        public static final String ENDPOINT = "/api/v1/users/points";
+
+        @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
+        @Test
+        void returnsPoint_whenFindIsSuccessful() {
+            // arrange
+            UserEntity savedUser = userJpaRepository.save(
+                    new UserEntity("tempUser", "량호", Gender.M, "tempUser@gmail.com", "2020-12-12")
+            );
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-USER-ID", "tempUser");
+
+            // act
+            ParameterizedTypeReference<ApiResponse<Long>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<Long>> response =
+                    testRestTemplate.exchange(ENDPOINT, HttpMethod.GET, new HttpEntity<>(null, headers), responseType);
+
+            // assert
+            assertThat(response.getBody().data()).isEqualTo(savedUser.getPoint());
+
+        }
+
+        @DisplayName("X-USER-ID 헤더가 없을 경우, 400 Bad Request 응답을 반환한다.")
+        @Test
+        void returnsBadRequest_whenXUserIdHeaderIsMissing() {
+            // arrange
+            HttpHeaders headers = new HttpHeaders();
+
+            // act
+            ParameterizedTypeReference<ApiResponse<Long>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<Long>> response =
+                    testRestTemplate.exchange(ENDPOINT, HttpMethod.GET, new HttpEntity<>(null, headers), responseType);
+
+            // assert
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
