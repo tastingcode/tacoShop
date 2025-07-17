@@ -24,6 +24,8 @@ public class UserEntity extends BaseEntity {
 	private String birth;
 	@Column(nullable = false)
 	private String email;
+    @Column(nullable = false)
+    private Long point = 0L;
 
 	public static final String PATTERN_USER_ID = "^[a-zA-Z0-9]{1,10}$";
 	public static final String PATTERN_EMAIL = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";

@@ -36,4 +36,14 @@ public class UserV1ApiController implements UserV1ApiSpec {
 
         return ApiResponse.success(response);
     }
+
+    @GetMapping("/points")
+    @Override
+    public ApiResponse<Long> getUserPoint(@RequestHeader(name = "X-USER-ID") String headerUserId) {
+        Long point = userFacade.getUserPoint(headerUserId);
+
+        return ApiResponse.success(point);
+    }
+
+
 }

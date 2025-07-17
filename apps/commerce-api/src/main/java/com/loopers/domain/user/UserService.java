@@ -31,7 +31,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserEntity getUser(String userId) {
         return userRepository.findByUserId(userId).orElse(null);
+    }
 
+    @Transactional(readOnly = true)
+    public Long getUserPoint(String userId) {
+        UserEntity user = userRepository.findByUserId(userId).orElse(null);
+        return user != null ? user.getPoint() : null;
     }
 
 
