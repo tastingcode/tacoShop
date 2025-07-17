@@ -2,6 +2,7 @@ package com.loopers.domain.user;
 
 import com.loopers.application.user.UserInfo;
 import com.loopers.domain.user.constant.Gender;
+import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
@@ -13,6 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -30,14 +33,16 @@ public class UserServiceIntgTest {
 	@Autowired
 	private UserService userService;
 
-
 	@MockitoSpyBean
 	private UserRepository userRepository;
 
 	@Autowired
 	private DatabaseCleanUp databaseCleanUp;
 
-	@AfterEach
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @AfterEach
 	void tearDown() {
 		databaseCleanUp.truncateAllTables();
 	}
@@ -113,11 +118,52 @@ public class UserServiceIntgTest {
 
 		    // assert
 			assertThrows(CoreException.class, () -> userService.createUser(signUpRequest2));
-
-
 		}
-
 	}
 
+    /**
+     * 내 정보 조회
+     * - [x]  해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.
+     * - [x]  해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
+     */
+    @DisplayName("GET /api/v1/users/{id}")
+    @Nested
+    class Find {
+        private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/users/" + id;
 
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.")
+        @Test
+        void returnsTargetUserInfo_whenFindIsSuccessful() {
+            // arrange
+            String userId = "tempUser";
+            String email = "tempUser@gmail.com";
+            UserEntity savedUser = userJpaRepository.save(
+                    new UserEntity(userId, "량호", Gender.M, email, "2020-12-12")
+            );
+
+            // act
+            UserEntity user = userService.getUser(savedUser.getUserId());
+
+            // assert
+            assertAll(
+                    () -> assertThat(user).isNotNull(),
+                    () -> assertThat(user.getUserId()).isEqualTo(userId),
+                    () -> assertThat(user.getEmail()).isEqualTo(email)
+            );
+        }
+
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @Test
+        void returnsNull_whenInvalidIdIsProvided() {
+            // arrange
+            String invalidUsedId = "emptyUserId";
+
+            // act
+            UserEntity user = userService.getUser(invalidUsedId);
+
+
+            // assert
+            assertThat(user).isNull();
+        }
+    }
 }
