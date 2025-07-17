@@ -1,6 +1,8 @@
 package com.loopers.interfaces.api.user;
 
+import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.constant.Gender;
+import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -16,28 +18,36 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.function.Function;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserV1ApiE2ETest {
-	/**
-	 * 회원가입 E2E 테스트
-	 * - [x]  회원 가입이 성공할 경우, 생성된 유저 정보를 응답으로 반환한다.
-	 * - [x]  회원 가입 시에 성별이 없을 경우, `400 Bad Request` 응답을 반환한다.
-	 */
 
-	@Autowired
-	private TestRestTemplate testRestTemplate;
+	private final TestRestTemplate testRestTemplate;
+    private final UserJpaRepository userJpaRepository;
+	private final DatabaseCleanUp databaseCleanUp;
 
-	@Autowired
-	private DatabaseCleanUp databaseCleanUp;
+    @Autowired
+    public UserV1ApiE2ETest(TestRestTemplate testRestTemplate,UserJpaRepository userJpaRepository, DatabaseCleanUp databaseCleanUp) {
+        this.testRestTemplate = testRestTemplate;
+        this.userJpaRepository = userJpaRepository;
+        this.databaseCleanUp = databaseCleanUp;
+    }
 
 	@AfterEach
 	void tearDown() {
 		databaseCleanUp.truncateAllTables();
 	}
+
+    /**
+     * 회원가입 E2E 테스트
+     * - [x]  회원 가입이 성공할 경우, 생성된 유저 정보를 응답으로 반환한다.
+     * - [x]  회원 가입 시에 성별이 없을 경우, `400 Bad Request` 응답을 반환한다.
+     */
 
 	@DisplayName("POST /api/v1/users")
 	@Nested
@@ -94,4 +104,53 @@ public class UserV1ApiE2ETest {
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		}
 	}
+
+    /**
+     * 내 정보 조회
+     * - [x]  내 정보 조회에 성공할 경우, 해당하는 유저 정보를 응답으로 반환한다.
+     * - [x]  존재하지 않는 ID 로 조회할 경우, `404 Not Found` 응답을 반환한다.
+     */
+    @DisplayName("GET /api/v1/users/{id}")
+    @Nested
+    class Find {
+        private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/users/" + id;
+
+        @DisplayName("내 정보 조회에 성공할 경우, 해당하는 유저 정보를 응답으로 반환한다.")
+        @Test
+        void returnsTargetUserInfo_whenFindIsSuccessful() {
+            // arrange
+            UserEntity savedUser = userJpaRepository.save(
+                    new UserEntity("tempUser", "량호", Gender.M, "tempUser@gmail.com", "2020-12-12")
+            );
+
+            String endpoint = ENDPOINT_GET.apply(savedUser.getUserId());
+            // act
+            ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response =
+                    testRestTemplate.exchange(endpoint, HttpMethod.GET, new HttpEntity<>(null), responseType);
+
+            // assert
+            assertAll(
+                    () -> assertThat(response.getBody().data().userId()).isEqualTo(savedUser.getUserId()),
+                    () -> assertThat(response.getBody().data().email()).isEqualTo(savedUser.getEmail())
+            );
+
+        }
+        
+        @DisplayName("존재하지 않는 ID 로 조회할 경우, 404 Not Found 응답을 반환한다.")
+        @Test
+        void throwsBadRequest_whenInvalidIdIsProvided() {
+            // arrange
+            String invalidUsedId = "emptyUserId";
+            String endpoint = ENDPOINT_GET.apply(invalidUsedId);
+
+            // act
+            ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response =
+                    testRestTemplate.exchange(endpoint, HttpMethod.GET, new HttpEntity<>(null), responseType);
+            
+            // assert
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+    }
 }

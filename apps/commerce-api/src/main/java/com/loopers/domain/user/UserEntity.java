@@ -29,7 +29,7 @@ public class UserEntity extends BaseEntity {
 	public static final String PATTERN_EMAIL = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 	public static final String PATTERN_BIRTH = "^\\d{4}-\\d{2}-\\d{2}$";
 
-	UserEntity(
+	public UserEntity(
 			String userId,
 			String name,
 			Gender gender,

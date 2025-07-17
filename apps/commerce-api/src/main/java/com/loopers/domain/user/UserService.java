@@ -11,21 +11,28 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Component
 public class UserService {
-	private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-	@Transactional
-	public UserInfo createUser(UserV1Dto.SignUpRequest signUpRequest){
-		UserEntity userEntity = new UserEntity(signUpRequest.userId(),
-				signUpRequest.name(),
-				signUpRequest.gender(),
-				signUpRequest.email(),
-				signUpRequest.birth());
+    @Transactional
+    public UserInfo createUser(UserV1Dto.SignUpRequest signUpRequest) {
+        UserEntity userEntity = new UserEntity(signUpRequest.userId(),
+                signUpRequest.name(),
+                signUpRequest.gender(),
+                signUpRequest.email(),
+                signUpRequest.birth());
 
-		UserEntity user
-				= userRepository.createUser(userEntity).orElseThrow(()->{
-			return new CoreException(ErrorType.BAD_REQUEST, "회원 가입에 실패하였습니다.");
-		});
+        UserEntity user
+                = userRepository.createUser(userEntity)
+                .orElseThrow(() -> new CoreException(ErrorType.BAD_REQUEST, "회원 가입에 실패하였습니다."));
 
-		return UserInfo.from(user);
-	}
+        return UserInfo.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getUser(String userId) {
+        return userRepository.findByUserId(userId).orElse(null);
+
+    }
+
+
 }

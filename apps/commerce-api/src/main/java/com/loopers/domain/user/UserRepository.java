@@ -5,4 +5,5 @@ import java.util.Optional;
 public interface UserRepository {
 
 	Optional<UserEntity> createUser(UserEntity userEntity);
+    Optional<UserEntity> findByUserId(String userId);
 }
