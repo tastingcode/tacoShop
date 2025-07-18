@@ -4,6 +4,7 @@ import com.loopers.interfaces.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "User V1 API", description = "사용자 API 입니다.")
@@ -26,5 +27,11 @@ public interface UserV1ApiSpec {
             @RequestHeader(name = "X-USER-ID") String headerUserId
     );
 
+	@Operation(summary = "포인트 충전")
+	ApiResponse<UserV1Dto.PointResponse> chargePoint(
+			@Schema(name = "X-USER-ID")
+			@RequestHeader(name = "X-USER-ID") String headerUserId,
+			@RequestBody UserV1Dto.PointRequest pointRequest
+	);
 
 }

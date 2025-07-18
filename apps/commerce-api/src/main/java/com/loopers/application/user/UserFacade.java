@@ -6,7 +6,6 @@ import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -33,5 +32,9 @@ public class UserFacade {
         }
         return point;
     }
+
+	public Long chargePoint(String userId, UserV1Dto.PointRequest pointRequest) {
+		return userService.chargePoint(userId, pointRequest);
+	}
 
 }
