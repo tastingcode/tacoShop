@@ -79,4 +79,25 @@ public class UserTest {
 		// assert
 		assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
 	}
+
+	/**
+	 * 포인트 충전 단위 테스트
+	 * - [x] 0 이하의 정수로 포인트를 충전 시 실패한다
+	 */
+	@DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다")
+	@ParameterizedTest
+	@ValueSource(longs = {0,-1000})
+	void fail_whenAddingPointAmountIsZeroOrNegative(Long amount) {
+	    // arrange
+		UserEntity user = new UserEntity("tempUser", "량호", Gender.M, "temp@gmail.com", "2020-12-12");
+	    
+	    // act
+		CoreException exception = assertThrows(CoreException.class, () -> {
+			user.addPoint(amount);
+		});
+
+		// assert
+		assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+	    
+	}
 }

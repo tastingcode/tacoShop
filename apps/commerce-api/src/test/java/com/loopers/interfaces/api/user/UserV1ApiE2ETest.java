@@ -197,4 +197,57 @@ public class UserV1ApiE2ETest {
         }
     }
 
+	/**
+	 * 포인트 충전
+	 * - [x]  존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.
+	 * - [x]  존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.
+	 */
+	@DisplayName("POST /api/v1/users/points")
+	@Nested
+	class ChargePoint{
+		public static final String ENDPOINT = "/api/v1/users/points";
+
+		@DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
+		@Test
+		void returnsPoint_whenMemberChargePointSuccessfully() {
+		    // arrange
+			UserEntity savedUser = userJpaRepository.save(
+					new UserEntity("tempUser", "량호", Gender.M, "tempUser@gmail.com", "2020-12-12")
+			);
+			UserV1Dto.PointRequest pointRequest = new UserV1Dto.PointRequest(1000L);
+			long totalPoint = savedUser.getPoint() + pointRequest.amount();
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("X-USER-ID", "tempUser");
+
+		    // act
+			ParameterizedTypeReference<ApiResponse<UserV1Dto.PointResponse>> responseType = new ParameterizedTypeReference<>() {};
+			ResponseEntity<ApiResponse<UserV1Dto.PointResponse>> response = testRestTemplate.exchange(ENDPOINT, HttpMethod.POST, new HttpEntity<>(pointRequest, headers), responseType);
+
+			// assert
+			assertThat(response.getBody().data().totalAmount()).isEqualTo(totalPoint);
+		}
+
+
+		@DisplayName("존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.")
+		@Test
+		void returnsNotFound_whenNotUserChargePoint() {
+		    // arrange
+			UserV1Dto.PointRequest pointRequest = new UserV1Dto.PointRequest(1000L);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("X-USER-ID", "NotUser");
+
+		    // act
+			ParameterizedTypeReference<ApiResponse<UserV1Dto.PointResponse>> responseType = new ParameterizedTypeReference<>() {};
+			ResponseEntity<ApiResponse<UserV1Dto.PointResponse>> response = testRestTemplate.exchange(ENDPOINT, HttpMethod.POST, new HttpEntity<>(pointRequest, headers), responseType);
+
+		    // assert
+			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+		}
+	}
+
+
+
 }
