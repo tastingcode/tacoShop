@@ -2,7 +2,6 @@ package com.loopers.application.product;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductDetail;
 import com.loopers.domain.product.constant.ProductSortType;
 import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
@@ -10,7 +9,6 @@ import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -37,6 +35,13 @@ class ProductFacadeTest {
 		databaseCleanUp.truncateAllTables();
 	}
 
+	/**
+	 * 상품 목록 조회 통합 테스트
+	 * - [x] 상품 정보 객체는 브랜드 정보, 좋아요 수를 포함한다.
+	 * - [x] 상품 목록 조회 시 최신순 기준으로 조회할 수 있다.
+	 * - [x] 상품 목록 조회 시 가격 오름차순 기준으로 조회할 수 있다.
+	 * - [x] 상품 목록 조회 시 좋아요 내림차순 기준으로 조회할 수 있다.
+	 */
 	@Nested
 	@DisplayName("상품 목록 조회")
 	class ProductList {
@@ -92,6 +97,25 @@ class ProductFacadeTest {
 			savedProduct3 = productJpaRepository.save(product3);
 		}
 
+		@DisplayName("상품 정보 객체는 브랜드 정보, 좋아요 수를 포함한다.")
+		@Test
+		void isProductInfoWithBrandAndLikeCount() {
+		    // arrange
+			ProductQuery query = ProductQuery.of(ProductSortType.LATEST, 0, 10);
+
+		    // act
+			ProductListInfo productListInfo = productFacade.getProductList(query);
+			List<ProductInfo> productInfoList = productListInfo.productInfoList();
+
+		    // assert
+			assertAll(
+					() -> assertThat(productInfoList).isNotNull(),
+					() -> assertThat(productListInfo.totalSize()).isEqualTo(3),
+					() -> assertThat(productInfoList.get(0).brandName()).isEqualTo(savedBrand1.getName()),
+					() -> assertThat(productInfoList.get(0).likeCount()).isEqualTo(savedProduct3.getLikeCount())
+			);
+		}
+
 		@DisplayName("상품 목록 조회 최신순")
 		@Test
 		void getProductListOrderByLatest() {
@@ -103,12 +127,14 @@ class ProductFacadeTest {
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 			// assert
-			assertThat(productInfoList).isNotNull();
-			assertThat(productListInfo.totalSize()).isEqualTo(3);
-			assertThat(productInfoList.get(0).productId()).isEqualTo(savedProduct3.getId());
+			assertAll(
+					() -> assertThat(productInfoList).isNotNull(),
+					() -> assertThat(productListInfo.totalSize()).isEqualTo(3),
+					() -> assertThat(productInfoList.get(0).productId()).isEqualTo(savedProduct3.getId())
+			);
 		}
 
-		@DisplayName("상품 목록 조회 가격오름차순")
+		@DisplayName("상품 목록 조회 가격 오름차순")
 		@Test
 		void getProductListOrderByPriceAsc() {
 			// arrange
@@ -119,9 +145,11 @@ class ProductFacadeTest {
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 			// assert
-			assertThat(productInfoList).isNotNull();
-			assertThat(productListInfo.totalSize()).isEqualTo(3);
-			assertThat(productInfoList.get(0).productId()).isEqualTo(savedProduct2.getId());
+			assertAll(
+					() -> assertThat(productInfoList).isNotNull(),
+					() -> assertThat(productListInfo.totalSize()).isEqualTo(3),
+					() -> assertThat(productInfoList.get(0).productId()).isEqualTo(savedProduct2.getId())
+			);
 		}
 
 
@@ -137,13 +165,19 @@ class ProductFacadeTest {
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 			// assert
-			assertThat(productInfoList).isNotNull();
-			assertThat(productListInfo.totalSize()).isEqualTo(3);
-			assertThat(productInfoList.get(0).productId()).isEqualTo(savedProduct1.getId());
+			assertAll(
+					() -> assertThat(productInfoList).isNotNull(),
+					() -> assertThat(productListInfo.totalSize()).isEqualTo(3),
+					() -> assertThat(productInfoList.get(0).productId()).isEqualTo(savedProduct1.getId())
+			);
 		}
 
 	}
 
+	/**
+	 * 상품 목록 조회 통합 테스트
+	 * - [x] 상품 정보 객체는 브랜드 정보, 좋아요 수를 포함한다.
+	 */
 	@Nested
 	@DisplayName("상품 상세 조회")
 	class ProductDetail {
