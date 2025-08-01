@@ -3,7 +3,6 @@ package com.loopers.domain.user;
 import com.loopers.application.user.UserInfo;
 import com.loopers.domain.user.constant.Gender;
 import com.loopers.infrastructure.user.UserJpaRepository;
-import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -15,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.function.Function;

@@ -63,4 +63,11 @@ public class UserEntity extends BaseEntity {
 		}
 		this.point += amount;
 	}
+
+	public void usePoint(long amount) {
+		if (amount <= 0){
+			throw new CoreException(ErrorType.BAD_REQUEST, "포인트는 0보다 작을 수 없습니다.");
+		}
+		this.point -= amount;
+	}
 }
