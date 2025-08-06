@@ -3,27 +3,25 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.user.UserEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class OrderService {
+public class OrderDomainService {
 
 	private final OrderRepository orderRepository;
 	private final ProductRepository productRepository;
+	private final OrderProductRepository orderProductRepository;
 
 	@Transactional
-	public Order createOrder(UserEntity userEntity, List<OrderProduct> orderProducts, List<Product> products) {
-		Order order = Order.create(userEntity, orderProducts);
-
-		// 재고 차감
+	public void deductStocks(List<OrderProduct> orderProducts, List<Product> products) {
 		orderProducts.forEach(orderProduct -> {
 			Product product = products.stream()
 					.filter(p -> p.getId().equals(orderProduct.getProductId()))
@@ -31,23 +29,6 @@ public class OrderService {
 					.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다." ));
 			product.deductStock(orderProduct.getQuantity());
 		});
-
-		// 포인트 차감
-		int totalPrice = order.calculateTotalPrice();
-		userEntity.usePoint(totalPrice);
-
-		// 주문 상태 변경
-		order.updateOrderStatus(OrderStatus.COMPLETED);
-
-		// 주문 저장
-		return save(order, products);
-	}
-
-	public Order save(Order order, List<Product> products) {
-		// 상품 저장
-		productRepository.saveAll(products);
-
-		return orderRepository.save(order);
 	}
 
 	/**
@@ -72,4 +53,21 @@ public class OrderService {
 			throw new CoreException(ErrorType.BAD_REQUEST, "재고가 부족합니다.");
 		}
 	}
+
+	// 주문 총액 계산
+	public int calculateTotalPrice(List<OrderProduct> orderProducts) {
+		return orderProducts.stream()
+				.mapToInt(item -> item.getPrice() * item.getQuantity())
+				.sum();
+	}
+
+	// 주문 상품 저장
+	public void saveOrderItems(Order order, List<OrderProduct> orderProducts) {
+		orderProducts.forEach(item -> {
+			OrderProduct orderProduct = OrderProduct.of(order.getId(), item.getProductId(), item.getPrice(), item.getQuantity());
+			orderProductRepository.save(orderProduct);
+		});
+	}
+
+
 }

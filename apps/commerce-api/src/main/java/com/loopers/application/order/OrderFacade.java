@@ -1,8 +1,10 @@
 package com.loopers.application.order;
 
+import com.loopers.application.coupon.CouponService;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderProduct;
-import com.loopers.domain.order.OrderService;
+import com.loopers.domain.order.OrderDomainService;
+import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
@@ -19,8 +21,9 @@ import java.util.List;
 public class OrderFacade {
 
 	private final UserService userService;
-	private final OrderService orderService;
+	private final OrderDomainService orderDomainService;
 	private final ProductRepository productRepository;
+	private final CouponService couponService;
 
 	public OrderInfo createOrder(OrderCommand command){
 		// 유저 조회
@@ -35,10 +38,31 @@ public class OrderFacade {
 		List<OrderProduct> orderProducts = command.orderProducts();
 
 		// 주문 상품 유효성 검증
-		orderService.validateOrderItems(orderProducts, products);
+		orderDomainService.validateOrderItems(orderProducts, products);
+
+		// 주문 총액 계산
+		int orderPrice = orderDomainService.calculateTotalPrice(orderProducts);
+
+		// 할인 금액 계산
+		int discountAmount = couponService.calcDiscountAmount(user.getId(), command.couponId(), orderPrice);
 
 		// 주문 생성
-		Order order = orderService.createOrder(user, orderProducts, products);
+		Order order = Order.create(user, orderProducts, orderPrice, discountAmount);
+
+		// 포인트 차감
+		user.usePoint(order.getFinalPrice());
+
+		// 재고 차감
+		orderDomainService.deductStocks(orderProducts, products);
+
+		// 쿠폰 사용
+		couponService.useCoupon(user.getId(), command.couponId());
+
+		// 주문 완료
+		order.updateStatus(OrderStatus.COMPLETED);
+
+		// 주문 상품 저장
+		orderDomainService.saveOrderItems(order, orderProducts);
 
 		return OrderInfo.from(order);
 	}
