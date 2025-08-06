@@ -23,15 +23,18 @@ public class Order extends BaseEntity {
 	private OrderDate orderDate;
 
 	@Enumerated(EnumType.STRING)
-	private OrderStatus status;
+	private OrderStatus status = OrderStatus.PENDING;
 
-	@Column(name = "total_price", nullable = false)
-	private int totalPrice;
+	@Column(name = "final_price", nullable = false)
+	private int finalPrice;
+
+	@Column(name = "discount_amount")
+	private int discountAmount;
 
 	@Transient
 	private List<OrderProduct> orderProducts = new ArrayList<>();
 
-	public static Order create(UserEntity user, List<OrderProduct> orderProducts) {
+	public static Order create(UserEntity user, List<OrderProduct> orderProducts, int orderPrice, int discountAmount) {
 		Order order = new Order();
 		for (OrderProduct orderProduct : orderProducts) {
 			order.addProduct(orderProduct);
@@ -40,14 +43,9 @@ public class Order extends BaseEntity {
 		order.userId = user.getId();
 		order.orderDate = OrderDate.of(LocalDateTime.now());
 		order.status = OrderStatus.PENDING;
-		order.totalPrice = order.calculateTotalPrice();
+		order.finalPrice = orderPrice - discountAmount;
+		order.discountAmount = discountAmount;
 		return order;
-	}
-
-	public int calculateTotalPrice() {
-		return orderProducts.stream()
-				.mapToInt(item -> item.getPrice() * item.getQuantity())
-				.sum();
 	}
 
 	public void addProduct(OrderProduct orderProduct) {
@@ -58,11 +56,7 @@ public class Order extends BaseEntity {
 		orderProducts.add(orderProduct);
 	}
 
-	public void updateOrderStatus(OrderStatus status) {
-		if (status == null) {
-			throw new IllegalArgumentException("주문 상태는 null일 수 없습니다.");
-		}
-
+	public void updateStatus(OrderStatus status) {
 		this.status = status;
 	}
 
