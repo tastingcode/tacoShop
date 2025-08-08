@@ -6,6 +6,7 @@ import com.loopers.support.error.ErrorType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +27,8 @@ public class Product extends BaseEntity {
 	@Column(name = "ref_brand_id", nullable = false)
 	private Long brandId;
 	private int likeCount;
+	@Version
+	private Long version;
 
 	@Builder
 	public Product (String name, int price, int stock, Long brandId, int likeCount) {

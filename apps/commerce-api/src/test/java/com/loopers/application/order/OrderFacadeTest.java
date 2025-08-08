@@ -1,11 +1,14 @@
 package com.loopers.application.order;
 
+import com.loopers.application.point.PointService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.coupon.*;
 import com.loopers.domain.order.OrderDomainService;
 import com.loopers.domain.order.OrderProduct;
 import com.loopers.domain.order.OrderStatus;
+import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
@@ -34,6 +37,9 @@ public class OrderFacadeTest {
 	private UserRepository userRepository;
 
 	@Autowired
+	private PointRepository pointRepository;
+
+	@Autowired
 	private BrandRepository brandRepository;
 
 	@Autowired
@@ -46,12 +52,16 @@ public class OrderFacadeTest {
 	private UserCouponJpaRepository userCouponRepository;
 
 	@Autowired
+	private PointService pointService;
+
+	@Autowired
 	OrderDomainService orderDomainService;
 
 	@Autowired
 	private DatabaseCleanUp databaseCleanUp;
 
 	private UserEntity user;
+	private int chargeAmount;
 	private Brand brand;
 	private Product product1;
 	private Product product2;
@@ -67,6 +77,8 @@ public class OrderFacadeTest {
 	void setUp() {
 		// 사용자 생성 및 저장
 		user = createAndSaveUser();
+
+		chargeAmount = pointService.chargePoint(user.getUserId(), 300000).amount();
 
 		// 브랜드 생성 및 저장
 		brand = createAndSaveBrand();
@@ -112,6 +124,8 @@ public class OrderFacadeTest {
 
 		UserCoupon foundUserCoupon = userCouponRepository.findByUserIdAndCouponId(user.getId(), coupon.getId()).orElseThrow();
 
+		Point point = pointRepository.findByUserId(user.getId()).orElseThrow();
+
 		// then
 		assertThat(orderInfo).isNotNull();
 		assertThat(orderInfo.finalPrice()).isEqualTo(finalPrice);
@@ -119,8 +133,10 @@ public class OrderFacadeTest {
 		assertThat(orderInfo.status()).isEqualTo(OrderStatus.COMPLETED);
 		assertThat(foundCoupon.getStatus()).isEqualTo(CouponStatus.USED);
 		assertThat(foundUserCoupon.isUsed()).isTrue();
+		assertThat(point.getAmount()).isEqualTo(chargeAmount - finalPrice);
 
 	}
+
 
 	// 사용자 생성 및 저장
 	private UserEntity createAndSaveUser() {
@@ -131,7 +147,7 @@ public class OrderFacadeTest {
 				"testUser@test.com",
 				"2020-12-12"
 		);
-		user.addPoint(300000L);
+
 		return userRepository.save(user);
 	}
 
