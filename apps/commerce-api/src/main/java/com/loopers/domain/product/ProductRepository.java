@@ -11,6 +11,8 @@ public interface ProductRepository {
 
 	Optional<Product> findById(Long id);
 
+	Optional<Product> findByIdForUpdate(Long id);
+
 	Page<ProductDetail> findProductsWithBrand(ProductQuery productQuery);
 
 	List<Product> findAllById(List<Long> productIds);

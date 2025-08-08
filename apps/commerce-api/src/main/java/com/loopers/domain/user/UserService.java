@@ -33,19 +33,4 @@ public class UserService {
         return userRepository.findByUserId(userId).orElse(null);
     }
 
-    @Transactional(readOnly = true)
-    public Long getUserPoint(String userId) {
-        UserEntity user = userRepository.findByUserId(userId).orElse(null);
-        return user != null ? user.getPoint() : null;
-    }
-
-	@Transactional
-	public Long chargePoint(String userId, UserV1Dto.PointRequest pointRequest) {
-		UserEntity user = userRepository.findByUserId(userId)
-				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다."));
-
-		user.addPoint(pointRequest.amount());
-		return user.getPoint();
-	}
-
 }

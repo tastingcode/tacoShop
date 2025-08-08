@@ -1,6 +1,7 @@
 package com.loopers.application.order;
 
 import com.loopers.application.coupon.CouponService;
+import com.loopers.application.point.PointService;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderProduct;
 import com.loopers.domain.order.OrderDomainService;
@@ -20,6 +21,7 @@ import java.util.List;
 @Component
 public class OrderFacade {
 
+	private final PointService pointService;
 	private final UserService userService;
 	private final OrderDomainService orderDomainService;
 	private final ProductRepository productRepository;
@@ -50,7 +52,7 @@ public class OrderFacade {
 		Order order = Order.create(user, orderProducts, orderPrice, discountAmount);
 
 		// 포인트 차감
-		user.usePoint(order.getFinalPrice());
+		pointService.useMyPoint(command.userId(), order.getFinalPrice());
 
 		// 재고 차감
 		orderDomainService.deductStocks(orderProducts, products);

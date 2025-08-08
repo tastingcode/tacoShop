@@ -4,6 +4,7 @@ import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,8 @@ public class UserCoupon extends BaseEntity {
 	@Column(name = "ref_coupon_id", nullable = false)
 	private Long couponId;
 	private boolean used = false;
+	@Version
+	private Long version;
 
 	public static UserCoupon of(Long userId, Long couponId) {
 		UserCoupon userCoupon = new UserCoupon();

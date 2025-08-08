@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,10 +22,8 @@ public class OrderDomainService {
 	@Transactional
 	public void deductStocks(List<OrderProduct> orderProducts, List<Product> products) {
 		orderProducts.forEach(orderProduct -> {
-			Product product = products.stream()
-					.filter(p -> p.getId().equals(orderProduct.getProductId()))
-					.findFirst()
-					.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다." ));
+			Product product = productRepository.findByIdForUpdate(orderProduct.getProductId())
+					.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. 상품 ID: "));
 			product.deductStock(orderProduct.getQuantity());
 		});
 	}
