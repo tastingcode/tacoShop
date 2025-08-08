@@ -14,6 +14,7 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class OrderFacade {
 	private final ProductRepository productRepository;
 	private final CouponService couponService;
 
+	@Transactional
 	public OrderInfo createOrder(OrderCommand command){
 		// 유저 조회
 		UserEntity user = getVerifiedUser(command.userId());

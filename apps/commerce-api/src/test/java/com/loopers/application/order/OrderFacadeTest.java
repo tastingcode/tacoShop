@@ -15,6 +15,7 @@ import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.domain.user.constant.Gender;
 import com.loopers.infrastructure.coupon.UserCouponJpaRepository;
+import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 public class OrderFacadeTest {
@@ -135,6 +137,60 @@ public class OrderFacadeTest {
 		assertThat(foundUserCoupon.isUsed()).isTrue();
 		assertThat(point.getAmount()).isEqualTo(chargeAmount - finalPrice);
 
+	}
+
+	@DisplayName("사용 불가능하거나 존재하지 않는 쿠폰일 경우 주문은 실패해야 한다.")
+	@Test
+	void 사용_불가능하거나_존재하지_않는_쿠폰일_경우_주문은_실패해야_한다() {
+		// arrange
+		Long notExistCouponId = -1L;
+		OrderCommand wrongOrderCommand = new OrderCommand(user.getUserId(), orderProducts, notExistCouponId);
+
+		// act && assert
+		assertThatThrownBy(() -> orderFacade.createOrder(wrongOrderCommand))
+				.isInstanceOf(CoreException.class);
+	}
+
+	@DisplayName("재고가 존재하지 않거나 부족할 경우 주문은 실패해야 한다.")
+	@Test
+	void 재고가_존재하지_않거나_부족할_경우_주문은_실패해야_한다() {
+		// arrange
+		Product product1 = createAndSaveProduct("상품A", 3000, 0, brand.getId());
+		Product product2 = createAndSaveProduct("상품A", 3000, 0, brand.getId());
+
+		List<OrderProduct> orderProducts = List.of(
+				OrderProduct.of(null, product1.getId(), product1.getPrice(), 2),
+				OrderProduct.of(null, product2.getId(), product2.getPrice(), 2)
+		);
+
+		orderCommand = new OrderCommand(user.getUserId(), orderProducts, coupon.getId());
+
+		// act && assert
+		assertThatThrownBy(() -> orderFacade.createOrder(orderCommand))
+				.isInstanceOf(CoreException.class);
+	}
+
+	@DisplayName("주문 시 유저의 포인트 잔액이 부족할 경우 주문은 실패해야 한다")
+	@Test
+	void 주문_시_유저의_포인트_잔액이_부족할_경우_주문은_실패해야_한다() {
+		// arrange
+		UserEntity user = new UserEntity(
+				"zeroPoint",
+				"테스트유저",
+				Gender.M,
+				"testUser@test.com",
+				"2020-12-12"
+		);
+		UserEntity savedUser = userRepository.save(user);
+
+		final int _10O0_POINT = 1000;
+		pointService.chargePoint(savedUser.getUserId(), _10O0_POINT).amount();
+
+		orderCommand = new OrderCommand(savedUser.getUserId(), orderProducts, coupon.getId());
+
+		// act && assert
+		assertThatThrownBy(() -> orderFacade.createOrder(orderCommand))
+				.isInstanceOf(CoreException.class);
 	}
 
 

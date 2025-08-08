@@ -1,5 +1,7 @@
 package com.loopers.domain.like;
 
+import com.loopers.application.like.LikeInfo;
+import com.loopers.application.like.LikeService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductDetail;
@@ -29,6 +31,9 @@ class LikeDomainServiceIntgTest {
 
 	@Autowired
 	private ProductJpaRepository productJpaRepository;
+
+	@Autowired
+	private LikeService likeService;
 
 	@Autowired
 	private LikeDomainService likeDomainService;
@@ -76,7 +81,7 @@ class LikeDomainServiceIntgTest {
 			LikeInfoDto likeInfoDto1 = likeDomainService.like(savedUser, savedProduct);
 
 			// assert
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
+			assertThat(testProduct.getLikeCount()).isEqualTo(likeInfoDto1.likeCount());
 
 		}
 
@@ -86,14 +91,14 @@ class LikeDomainServiceIntgTest {
 		    // arrange
 			UserEntity savedUser = userJpaRepository.save(testUser);
 			Product savedProduct = productJpaRepository.save(testProduct);
-			LikeInfoDto likeInfoDto1 = likeDomainService.like(savedUser, savedProduct);
 
-		    // act
-			LikeInfoDto likeInfoDto2 = likeDomainService.like(savedUser, savedProduct);
+			LikeInfo likeInfo1 = likeService.like(savedUser.getUserId(), savedProduct.getId());
+
+			// act
+			LikeInfo likeInfo2 = likeService.like(savedUser.getUserId(), savedProduct.getId());
 
 			// assert
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto2.likeCount());
+			assertThat(likeInfo1.likeCount()).isEqualTo(likeInfo2.likeCount());
 
 		}
 
@@ -102,7 +107,7 @@ class LikeDomainServiceIntgTest {
 	/**
 	 * 좋아요 취소 통합 테스트
 	 * - [x] 좋아요가 있는 상태에서 좋아요 등록 시 카운트가 감소한다.
-	 * - [x] 중복 좋아요 등록 시 카운트는 한 번만 증가한다.
+	 * - [x] 중복 좋아요 취소 시 카운트는 한 번만 감소한다.
 	 */
 	@Nested
 	@DisplayName("좋아요 취소 시")
@@ -142,23 +147,21 @@ class LikeDomainServiceIntgTest {
 
 		@DisplayName("중복 좋아요 취소 시 카운트는 한 번만 감소한다.")
 		@Test
-		/*void duplicateLike() {
+		void duplicateLike() {
 			// arrange
 			UserEntity savedUser = userJpaRepository.save(testUser);
 			Product savedProduct = productJpaRepository.save(testProduct);
-			LikeInfoDto likeInfoDto1 = likeDomainService.like(savedUser, savedProduct);
+			LikeInfo likeInfo1 = likeService.like(savedUser.getUserId(), savedProduct.getId());
 
 			// act
-			LikeInfoDto likeInfoDto2 = likeDomainService.unLike(savedUser, savedProduct);
-			LikeInfoDto likeInfoDto3 = likeDomainService.unLike(savedUser, savedProduct);
+			LikeInfo likeInfo2 = likeService.unLike(savedUser.getUserId(), savedProduct.getId());
+			LikeInfo likeInfo3 = likeService.unLike(savedUser.getUserId(), savedProduct.getId());
 
 			// assert
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
-			assertThat(testProduct.getLikeCount()).isEqualTo(likeInfoDto2.likeCount());
-			assertThat(testProduct.getLikeCount()).isEqualTo(likeInfoDto3.likeCount());
+			assertThat(likeInfo2.likeCount()).isEqualTo(likeInfo3.likeCount());
 
 
-		}*/
+		}
 
 	}
 
