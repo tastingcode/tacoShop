@@ -7,7 +7,8 @@ import java.util.List;
 
 public record OrderCommand(
         String userId,
-        List<OrderProduct> orderProducts
+        List<OrderProduct> orderProducts,
+		Long couponId
 ) {
 
 }

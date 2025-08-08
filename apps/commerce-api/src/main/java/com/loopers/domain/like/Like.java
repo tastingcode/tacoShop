@@ -19,7 +19,6 @@ public class Like extends BaseEntity {
 	private Long userId;
 	@Column(name = "ref_product_id")
 	private Long productId;
-	@Getter
 	private boolean liked;
 
 	public static Like of(Long userId, Long productId) {

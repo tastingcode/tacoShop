@@ -14,6 +14,11 @@ public class BrandRepositoryImpl implements BrandRepository {
 	private final BrandJpaRepository brandJpaRepository;
 
 	@Override
+	public Brand save(Brand brand) {
+		return brandJpaRepository.save(brand);
+	}
+
+	@Override
 	public Optional<Brand> findById(Long id) {
 		return brandJpaRepository.findById(id);
 	}

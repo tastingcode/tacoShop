@@ -14,10 +14,9 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class LikeService {
+public class LikeDomainService {
 	private final LikeRepository likeRepository;
 
-	@Transactional
 	public LikeInfoDto like(UserEntity user, Product product) {
 		// like 생성
 		Optional<Like> optionalLike = findByUserIdAndProductId(user.getId(), product.getId());
@@ -33,7 +32,6 @@ public class LikeService {
 		return LikeInfoDto.from(like, likeCount);
 	}
 
-	@Transactional
 	public LikeInfoDto unLike(UserEntity user, Product product) {
 		// like 생성
 		Like like = findByUserIdAndProductId(user.getId(), product.getId())
@@ -48,12 +46,9 @@ public class LikeService {
 		return LikeInfoDto.from(like, likeCount);
 	}
 
-	@Transactional(readOnly = true)
 	public List<ProductDetail> getLikedProducts(UserEntity user) {
 		return likeRepository.findLikedProducts(user.getId());
 	}
-
-
 
 	public Like getLikeOrCreate(Optional<Like> optionalLike, UserEntity user, Product product) {
 		if (optionalLike.isPresent()) {
