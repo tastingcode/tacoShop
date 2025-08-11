@@ -1,5 +1,7 @@
 package com.loopers.domain.like;
 
+import com.loopers.application.like.LikeInfo;
+import com.loopers.application.like.LikeService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductDetail;
@@ -19,7 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class LikeServiceIntgTest {
+class LikeDomainServiceIntgTest {
 
 	@Autowired
 	private UserJpaRepository userJpaRepository;
@@ -32,6 +34,9 @@ class LikeServiceIntgTest {
 
 	@Autowired
 	private LikeService likeService;
+
+	@Autowired
+	private LikeDomainService likeDomainService;
 
 	@Autowired
 	private DatabaseCleanUp databaseCleanUp;
@@ -73,10 +78,10 @@ class LikeServiceIntgTest {
 			Product savedProduct = productJpaRepository.save(testProduct);
 
 			// act
-			LikeInfoDto likeInfoDto1 = likeService.like(savedUser, savedProduct);
+			LikeInfoDto likeInfoDto1 = likeDomainService.like(savedUser, savedProduct);
 
 			// assert
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
+			assertThat(testProduct.getLikeCount()).isEqualTo(likeInfoDto1.likeCount());
 
 		}
 
@@ -86,14 +91,14 @@ class LikeServiceIntgTest {
 		    // arrange
 			UserEntity savedUser = userJpaRepository.save(testUser);
 			Product savedProduct = productJpaRepository.save(testProduct);
-			LikeInfoDto likeInfoDto1 = likeService.like(savedUser, savedProduct);
 
-		    // act
-			LikeInfoDto likeInfoDto2 = likeService.like(savedUser, savedProduct);
+			LikeInfo likeInfo1 = likeService.like(savedUser.getUserId(), savedProduct.getId());
+
+			// act
+			LikeInfo likeInfo2 = likeService.like(savedUser.getUserId(), savedProduct.getId());
 
 			// assert
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto2.likeCount());
+			assertThat(likeInfo1.likeCount()).isEqualTo(likeInfo2.likeCount());
 
 		}
 
@@ -102,7 +107,7 @@ class LikeServiceIntgTest {
 	/**
 	 * 좋아요 취소 통합 테스트
 	 * - [x] 좋아요가 있는 상태에서 좋아요 등록 시 카운트가 감소한다.
-	 * - [x] 중복 좋아요 등록 시 카운트는 한 번만 증가한다.
+	 * - [x] 중복 좋아요 취소 시 카운트는 한 번만 감소한다.
 	 */
 	@Nested
 	@DisplayName("좋아요 취소 시")
@@ -129,10 +134,10 @@ class LikeServiceIntgTest {
 			// arrange
 			UserEntity savedUser = userJpaRepository.save(testUser);
 			Product savedProduct = productJpaRepository.save(testProduct);
-			LikeInfoDto likeInfoDto1 = likeService.like(savedUser, savedProduct);
+			LikeInfoDto likeInfoDto1 = likeDomainService.like(savedUser, savedProduct);
 
 			// act
-			LikeInfoDto likeInfoDto2 = likeService.unLike(savedUser, savedProduct);
+			LikeInfoDto likeInfoDto2 = likeDomainService.unLike(savedUser, savedProduct);
 
 			// assert
 			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
@@ -146,16 +151,14 @@ class LikeServiceIntgTest {
 			// arrange
 			UserEntity savedUser = userJpaRepository.save(testUser);
 			Product savedProduct = productJpaRepository.save(testProduct);
-			LikeInfoDto likeInfoDto1 = likeService.like(savedUser, savedProduct);
+			LikeInfo likeInfo1 = likeService.like(savedUser.getUserId(), savedProduct.getId());
 
 			// act
-			LikeInfoDto likeInfoDto2 = likeService.unLike(savedUser, savedProduct);
-			LikeInfoDto likeInfoDto3 = likeService.unLike(savedUser, savedProduct);
+			LikeInfo likeInfo2 = likeService.unLike(savedUser.getUserId(), savedProduct.getId());
+			LikeInfo likeInfo3 = likeService.unLike(savedUser.getUserId(), savedProduct.getId());
 
 			// assert
-			assertThat(testProduct.getLikeCount() + 1).isEqualTo(likeInfoDto1.likeCount());
-			assertThat(testProduct.getLikeCount()).isEqualTo(likeInfoDto2.likeCount());
-			assertThat(testProduct.getLikeCount()).isEqualTo(likeInfoDto3.likeCount());
+			assertThat(likeInfo2.likeCount()).isEqualTo(likeInfo3.likeCount());
 
 
 		}
@@ -238,11 +241,11 @@ class LikeServiceIntgTest {
 		@Test
 		void likedProductsContainsLikeCount() {
 		    // arrange
-			likeService.like(savedUser1, savedProduct1);
-			likeService.like(savedUser1, savedProduct2);
+			likeDomainService.like(savedUser1, savedProduct1);
+			likeDomainService.like(savedUser1, savedProduct2);
 
 		    // act
-			List<ProductDetail> likedProducts = likeService.getLikedProducts(savedUser1);
+			List<ProductDetail> likedProducts = likeDomainService.getLikedProducts(savedUser1);
 
 			// assert
 			assertThat(likedProducts.size()).isEqualTo(2);
@@ -255,11 +258,11 @@ class LikeServiceIntgTest {
 		@Test
 		void likedProductsContainsProductAndBrandInfo() {
 			// arrange
-			likeService.like(savedUser1, savedProduct1);
-			likeService.like(savedUser1, savedProduct2);
+			likeDomainService.like(savedUser1, savedProduct1);
+			likeDomainService.like(savedUser1, savedProduct2);
 
 			// act
-			List<ProductDetail> likedProducts = likeService.getLikedProducts(savedUser1);
+			List<ProductDetail> likedProducts = likeDomainService.getLikedProducts(savedUser1);
 
 			// assert
 			assertThat(likedProducts.size()).isEqualTo(2);

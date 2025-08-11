@@ -37,21 +37,5 @@ public class UserV1ApiController implements UserV1ApiSpec {
         return ApiResponse.success(response);
     }
 
-    @GetMapping("/points")
-    @Override
-    public ApiResponse<Long> getUserPoint(@RequestHeader(name = "X-USER-ID") String headerUserId) {
-        Long point = userFacade.getUserPoint(headerUserId);
-
-        return ApiResponse.success(point);
-    }
-
-	@PostMapping("/points")
-	@Override
-	public ApiResponse<UserV1Dto.PointResponse> chargePoint(@RequestHeader (name = "X-USER-ID") String headerUserId,
-															UserV1Dto.PointRequest pointRequest) {
-		Long totalPoint = userFacade.chargePoint(headerUserId, pointRequest);
-		UserV1Dto.PointResponse pointResponse = new UserV1Dto.PointResponse(totalPoint);
-		return ApiResponse.success(pointResponse);
-	}
 
 }

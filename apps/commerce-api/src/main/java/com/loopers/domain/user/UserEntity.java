@@ -57,17 +57,4 @@ public class UserEntity extends BaseEntity {
 		this.birth = birth;
 	}
 
-	public void addPoint(Long amount) {
-		if (amount <= 0){
-			throw new CoreException(ErrorType.BAD_REQUEST, "0 이하의 점수로 포인트를 충전 시 실패합니다.");
-		}
-		this.point += amount;
-	}
-
-	public void usePoint(long amount) {
-		if (amount <= 0){
-			throw new CoreException(ErrorType.BAD_REQUEST, "포인트는 0보다 작을 수 없습니다.");
-		}
-		this.point -= amount;
-	}
 }
