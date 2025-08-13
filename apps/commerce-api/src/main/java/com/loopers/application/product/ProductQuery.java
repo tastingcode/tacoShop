@@ -5,13 +5,15 @@ import lombok.Getter;
 
 @Getter
 public class ProductQuery {
+	private Long brandId;
 	private ProductSortType sortType;
 	private int page;
 	private int size;
 
-	public static ProductQuery of(ProductSortType sortType, int page, int size) {
+	public static ProductQuery of(Long brandId, ProductSortType sortType, int page, int size) {
 		ProductQuery productQuery = new ProductQuery();
-		productQuery.sortType = sortType;
+		productQuery.brandId = brandId;
+		productQuery.sortType = sortType == null ? ProductSortType.LATEST : sortType;
 		productQuery.page = page;
 		productQuery.size = size;
 		return productQuery;
