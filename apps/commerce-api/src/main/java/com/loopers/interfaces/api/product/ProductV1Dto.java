@@ -11,8 +11,8 @@ public class ProductV1Dto {
 	public record ProductListRequest(
 			Long brandId,
 			ProductSortType productSortType,
-			int page,
-			int size
+			Integer page,
+			Integer size
 	){}
 
 	public record ProductResponse(

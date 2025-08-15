@@ -10,12 +10,12 @@ public class ProductQuery {
 	private int page;
 	private int size;
 
-	public static ProductQuery of(Long brandId, ProductSortType sortType, int page, int size) {
+	public static ProductQuery of(Long brandId, ProductSortType sortType, Integer page, Integer size) {
 		ProductQuery productQuery = new ProductQuery();
 		productQuery.brandId = brandId;
 		productQuery.sortType = sortType == null ? ProductSortType.LATEST : sortType;
-		productQuery.page = page;
-		productQuery.size = size;
+		productQuery.page = (page == null) ? 0 : page ;
+		productQuery.size = (size == null) ? 10 : size ;
 		return productQuery;
 	}
 
