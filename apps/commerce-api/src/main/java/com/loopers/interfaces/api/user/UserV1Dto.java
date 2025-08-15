@@ -36,11 +36,4 @@ public class UserV1Dto {
 		}
 	}
 
-	public record PointRequest(Long amount){ }
-
-	public record PointResponse(Long totalAmount){
-		public static PointResponse from(Long totalAmount) {
-			return new PointResponse(totalAmount);
-		}
-	}
 }

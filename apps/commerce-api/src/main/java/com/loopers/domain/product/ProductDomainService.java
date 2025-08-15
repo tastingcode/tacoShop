@@ -11,15 +11,13 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class ProductService {
+public class ProductDomainService {
     private final ProductRepository productRepository;
 
-    @Transactional(readOnly = true)
     public Optional<Product> getProduct(Long productId) {
         return productRepository.findById(productId);
     }
-    
-    @Transactional(readOnly = true)
+
     public Page<ProductDetail> getProducts(ProductQuery productQuery) {
         return productRepository.findProductsWithBrand(productQuery);
     }

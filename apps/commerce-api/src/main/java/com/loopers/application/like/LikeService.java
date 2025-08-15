@@ -5,9 +5,9 @@ import com.loopers.domain.like.LikeDomainService;
 import com.loopers.domain.like.LikeInfoDto;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductDetail;
-import com.loopers.domain.product.ProductService;
+import com.loopers.domain.product.ProductDomainService;
 import com.loopers.domain.user.UserEntity;
-import com.loopers.domain.user.UserService;
+import com.loopers.domain.user.UserDomainService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class LikeService {
-	private final UserService userService;
-	private final ProductService productService;
+	private final UserDomainService userDomainService;
+	private final ProductDomainService productDomainService;
 	private final LikeDomainService likeDomainService;
 
 	@Retryable(
@@ -65,7 +65,7 @@ public class LikeService {
 	}
 
 	private UserEntity getVerifiedUser(String userId) {
-		UserEntity user = userService.getUser(userId);
+		UserEntity user = userDomainService.getUser(userId);
 		if (user == null) {
 			throw new CoreException(ErrorType.NOT_FOUND, "로그인 한 회원만 이용할 수 있습니다.");
 		}
@@ -73,7 +73,7 @@ public class LikeService {
 	}
 
 	private Product getVerifiedProduct(Long productId) {
-		return productService.getProduct(productId)
+		return productDomainService.getProduct(productId)
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 	}
 }

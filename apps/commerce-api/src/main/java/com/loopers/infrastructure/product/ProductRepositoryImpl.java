@@ -6,6 +6,7 @@ import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductDetail;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.QProduct;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -44,7 +45,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 	@Override
     public Page<ProductDetail> findProductsWithBrand(ProductQuery productQuery) {
         QProduct product = QProduct.product;
-        QBrand brand = QBrand.brand;
+		QBrand brand = QBrand.brand;
+
+		BooleanBuilder brandFilter = ProductQueryFilter.getBrandFilter(productQuery.getBrandId());
 
 		// 정렬 조건
 		OrderSpecifier<?> orderSpecifier = ProductQueryFilter.getOrderSpecifier(productQuery.getSortType(), product);
@@ -63,19 +66,19 @@ public class ProductRepositoryImpl implements ProductRepository {
 				))
 				.from(product)
 				.leftJoin(brand).on(product.brandId.eq(brand.id))
+				.where(brandFilter)
 				.orderBy(orderSpecifier)
 				.offset((long) productQuery.getPage() * productQuery.getSize())
 				.limit(productQuery.getSize())
 				.fetch();
 
 		// 전체 카운트 조회
-		int total = jpaQueryFactory
-				.selectFrom(product)
-				.leftJoin(brand).on(product.brandId.eq(brand.id))
+		Long total = jpaQueryFactory
+				.select(product.count())
+				.from(product)
+				.where(brandFilter)
 				.orderBy(orderSpecifier)
-				.offset((long) productQuery.getPage() * productQuery.getSize())
-				.limit(productQuery.getSize())
-				.fetch().size();
+				.fetchOne();
 
 		Pageable pageable = PageRequest.of(productQuery.getPage(), productQuery.getSize());
         return new PageImpl<>(products, pageable, total);

@@ -24,14 +24,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-public class UserServiceIntgTest {
+public class UserDomainServiceIntgTest {
 	/**
 	 * 회원 가입 통합 테스트
 	 * - [x]  회원 가입시 User 저장이 수행된다. ( spy 검증 )
 	 * - [x]  이미 가입된 ID 로 회원가입 시도 시, 실패한다.
 	 */
 	@Autowired
-	private UserService userService;
+	private UserDomainService userDomainService;
 
 	@MockitoSpyBean
 	private UserRepository userRepository;
@@ -71,7 +71,7 @@ public class UserServiceIntgTest {
 			ArgumentCaptor<UserEntity> userEntityArgumentCaptor = ArgumentCaptor.forClass(UserEntity.class);
 
 			// act
-			UserInfo user = userService.createUser(signUpRequest);
+			UserInfo user = userDomainService.createUser(signUpRequest);
 			UserV1Dto.UserResponse userResponse = UserV1Dto.UserResponse.from(user);
 
 			// assert
@@ -114,10 +114,10 @@ public class UserServiceIntgTest {
 			);
 
 			// act
-			userService.createUser(signUpRequest1);
+			userDomainService.createUser(signUpRequest1);
 
 		    // assert
-			assertThrows(CoreException.class, () -> userService.createUser(signUpRequest2));
+			assertThrows(CoreException.class, () -> userDomainService.createUser(signUpRequest2));
 		}
 	}
 
@@ -142,7 +142,7 @@ public class UserServiceIntgTest {
             );
 
             // act
-            UserEntity user = userService.getUser(savedUser.getUserId());
+            UserEntity user = userDomainService.getUser(savedUser.getUserId());
 
             // assert
             assertAll(
@@ -159,7 +159,7 @@ public class UserServiceIntgTest {
             String invalidUsedId = "emptyUserId";
 
             // act
-            UserEntity user = userService.getUser(invalidUsedId);
+            UserEntity user = userDomainService.getUser(invalidUsedId);
 
 
             // assert
