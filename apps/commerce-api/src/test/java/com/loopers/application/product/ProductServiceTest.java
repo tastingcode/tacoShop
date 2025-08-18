@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
-class ProductFacadeTest {
+class ProductServiceTest {
 
 	@Autowired
-	private ProductFacade productFacade;
+	private ProductService productService;
 
 	@Autowired
 	private ProductJpaRepository productJpaRepository;
@@ -101,10 +101,10 @@ class ProductFacadeTest {
 		@Test
 		void isProductInfoWithBrandAndLikeCount() {
 		    // arrange
-			ProductQuery query = ProductQuery.of(ProductSortType.LATEST, 0, 10);
+			ProductQuery query = ProductQuery.of(null, ProductSortType.LATEST, 0, 10);
 
 		    // act
-			ProductListInfo productListInfo = productFacade.getProductList(query);
+			ProductListInfo productListInfo = productService.getProductList(query);
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 		    // assert
@@ -120,10 +120,10 @@ class ProductFacadeTest {
 		@Test
 		void getProductListOrderByLatest() {
 			// arrange
-			ProductQuery query = ProductQuery.of(ProductSortType.LATEST, 0, 10);
+			ProductQuery query = ProductQuery.of(null, ProductSortType.LATEST, 0, 10);
 
 			// act
-			ProductListInfo productListInfo = productFacade.getProductList(query);
+			ProductListInfo productListInfo = productService.getProductList(query);
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 			// assert
@@ -138,10 +138,10 @@ class ProductFacadeTest {
 		@Test
 		void getProductListOrderByPriceAsc() {
 			// arrange
-			ProductQuery query = ProductQuery.of(ProductSortType.PRICE_ASC, 0, 10);
+			ProductQuery query = ProductQuery.of(null, ProductSortType.PRICE_ASC, 0, 10);
 
 			// act
-			ProductListInfo productListInfo = productFacade.getProductList(query);
+			ProductListInfo productListInfo = productService.getProductList(query);
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 			// assert
@@ -158,10 +158,10 @@ class ProductFacadeTest {
 		@Test
 		void getProductListOrderByLikesDesc() {
 		    // arrange
-			ProductQuery query = ProductQuery.of(ProductSortType.LIKES_DESC, 0, 10);
+			ProductQuery query = ProductQuery.of(null, ProductSortType.LIKES_DESC, 0, 10);
 
 			// act
-			ProductListInfo productListInfo = productFacade.getProductList(query);
+			ProductListInfo productListInfo = productService.getProductList(query);
 			List<ProductInfo> productInfoList = productListInfo.productInfoList();
 
 			// assert
@@ -205,7 +205,7 @@ class ProductFacadeTest {
 			Brand saveBrand = brandJpaRepository.save(brand);
 
 		    // act
-			ProductInfo productInfo = productFacade.getProductDetail(saveProduct.getId());
+			ProductInfo productInfo = productService.getProductDetail(saveProduct.getId());
 
 			// assert
 			assertAll(

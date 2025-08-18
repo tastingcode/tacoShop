@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class BrandService {
+public class BrandDomainService {
 	private final BrandRepository brandRepository;
 
 	@Transactional(readOnly = true)
