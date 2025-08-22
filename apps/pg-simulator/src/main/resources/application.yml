@@ -24,34 +24,15 @@ spring:
       - logging.yml
       - monitoring.yml
 
+datasource:
+  mysql-jpa:
+    main:
+      jdbc-url: jdbc:mysql://localhost:3306/paymentgateway
+
 springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
-
-resilience4j:
-  retry:
-    instances:
-      pgRetry:
-        max-attempts: 3
-        wait-duration: 1s
-        retry-exceptions:
-          - feign.RetryableException
-          - java.net.SocketTimeoutException
-        fail-after-max-attempts: true
-        enable-exponential-backoff: true
-        exponential-backoff-multiplier: 2
-  circuitbreaker:
-    instances:
-      pgCircuit:
-        sliding-window-type: count_based
-        sliding-window-size: 10
-        failure-rate-threshold: 50 # 실패율 임계값
-        slow-call-rate-threshold: 50 # 느린 호출 비율 임계값
-        slow-call-duration-threshold: 2s # 느린 호출 지속 시간 임계값
-        minimum-number-of-calls: 10 # 최소 호출
-        wait-duration-in-open-state: 5s # 오픈 상태에서 대기 시간
-        permitted-number-of-calls-in-half-open-state: 3 # HALF_OPEN 상태에서 호출 허용 수
 
 ---
 spring:
@@ -59,11 +40,25 @@ spring:
     activate:
       on-profile: local, test
 
+server:
+  port: 8082
+
+management:
+  server:
+    port: 8083
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
+
+server:
+  port: 8082
+
+management:
+  server:
+    port: 8083
 
 ---
 spring:
