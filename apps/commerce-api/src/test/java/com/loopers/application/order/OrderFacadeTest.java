@@ -132,7 +132,7 @@ public class OrderFacadeTest {
 		assertThat(orderInfo).isNotNull();
 		assertThat(orderInfo.finalPrice()).isEqualTo(finalPrice);
 		assertThat(orderInfo.discountAmount()).isEqualTo(discountAmount);
-		assertThat(orderInfo.status()).isEqualTo(OrderStatus.COMPLETED);
+		assertThat(orderInfo.status()).isEqualTo(OrderStatus.PENDING);
 		assertThat(foundCoupon.getStatus()).isEqualTo(CouponStatus.USED);
 		assertThat(foundUserCoupon.isUsed()).isTrue();
 		assertThat(point.getAmount()).isEqualTo(chargeAmount - finalPrice);

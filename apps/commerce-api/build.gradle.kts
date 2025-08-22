@@ -25,4 +25,11 @@ dependencies {
 
     // aspects
     implementation("org.springframework:spring-aspects")
+
+    // Feign Client
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0")
+
+    // Resilience4j
+    implementation("io.github.resilience4j:resilience4j-spring-boot3")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 }
