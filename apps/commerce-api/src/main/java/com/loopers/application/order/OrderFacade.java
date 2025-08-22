@@ -28,7 +28,7 @@ public class OrderFacade {
 	private final ProductRepository productRepository;
 	private final CouponService couponService;
 
-	@Transactional
+@Transactional
 	public OrderInfo createOrder(OrderCommand command){
 		// 유저 조회
 		UserEntity user = getVerifiedUser(command.userId());
@@ -62,8 +62,8 @@ public class OrderFacade {
 		// 쿠폰 사용
 		couponService.useCoupon(user.getId(), command.couponId());
 
-		// 주문 완료
-		order.updateStatus(OrderStatus.COMPLETED);
+		// 주문 생성
+		order.updateStatus(OrderStatus.PENDING);
 
 		// 주문 상품 저장
 		orderDomainService.saveOrderItems(order, orderProducts);
