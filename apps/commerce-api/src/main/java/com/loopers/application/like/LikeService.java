@@ -65,7 +65,7 @@ public class LikeService {
 	}
 
 	private UserEntity getVerifiedUser(String userId) {
-		UserEntity user = userDomainService.getUser(userId);
+		UserEntity user = userDomainService.getUserByUserId(userId);
 		if (user == null) {
 			throw new CoreException(ErrorType.NOT_FOUND, "로그인 한 회원만 이용할 수 있습니다.");
 		}

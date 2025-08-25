@@ -51,8 +51,8 @@ public class PaymentInfo {
 			return new PaymentResponse(Meta.of(pgResponse), Data.of(pgResponse));
 		}
 
-		public static PaymentResponse fallback(){
-			Meta meta = new Meta("fail", null, null);
+		public static PaymentResponse fallback(String message){
+			Meta meta = new Meta("fail", null, message);
 			Data data = new Data(null, null, null);
 			return new PaymentResponse(meta, data);
 		}

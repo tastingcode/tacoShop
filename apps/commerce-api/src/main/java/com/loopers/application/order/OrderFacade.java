@@ -28,8 +28,8 @@ public class OrderFacade {
 	private final ProductRepository productRepository;
 	private final CouponService couponService;
 
-@Transactional
-	public OrderInfo createOrder(OrderCommand command){
+	@Transactional
+	public OrderInfo createOrder(OrderCommand command) {
 		// 유저 조회
 		UserEntity user = getVerifiedUser(command.userId());
 
@@ -51,19 +51,16 @@ public class OrderFacade {
 		int discountAmount = couponService.calcDiscountAmount(user.getId(), command.couponId(), orderPrice);
 
 		// 주문 생성
-		Order order = Order.create(user, orderProducts, orderPrice, discountAmount);
+		Order order = orderDomainService.createOrder(user, orderProducts, orderPrice, discountAmount, command.couponId());
 
 		// 포인트 차감
 		pointService.useMyPoint(command.userId(), order.getFinalPrice());
 
 		// 재고 차감
-		orderDomainService.deductStocks(orderProducts, products);
+		orderDomainService.deductStocks(orderProducts);
 
 		// 쿠폰 사용
 		couponService.useCoupon(user.getId(), command.couponId());
-
-		// 주문 생성
-		order.updateStatus(OrderStatus.PENDING);
 
 		// 주문 상품 저장
 		orderDomainService.saveOrderItems(order, orderProducts);
@@ -72,7 +69,7 @@ public class OrderFacade {
 	}
 
 	private UserEntity getVerifiedUser(String userId) {
-		UserEntity user = userDomainService.getUser(userId);
+		UserEntity user = userDomainService.getUserByUserId(userId);
 		if (user == null) {
 			throw new CoreException(ErrorType.NOT_FOUND, "로그인 한 회원만 이용할 수 있습니다.");
 		}
