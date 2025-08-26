@@ -52,7 +52,7 @@ public class PaymentInfo {
 		}
 
 		public static PaymentResponse fallback(String message){
-			Meta meta = new Meta("fail", null, message);
+			Meta meta = new Meta("FAIL", null, message);
 			Data data = new Data(null, null, null);
 			return new PaymentResponse(meta, data);
 		}

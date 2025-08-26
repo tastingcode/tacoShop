@@ -63,8 +63,7 @@ public class ProductService {
 
 	@Transactional(readOnly = true)
 	public ProductInfo getProductDetail(Long productId) {
-		Product product = productDomainService.getProduct(productId).orElseThrow(
-				() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
+		Product product = productDomainService.getProduct(productId);
 		Brand brand = brandDomainService.getBrand(product.getBrandId()).orElse(null);
 
 		ProductDetail productDetail = productDomainService.assembleProductDetail(product, brand);

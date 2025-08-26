@@ -19,7 +19,7 @@ public class PaymentFacade {
 		// 결제 요청
 		PaymentInfo.PaymentResponse paymentResponse = paymentGatewayService.requestPayment(command);
 
-		// 결제 생성
+		// 결제 생성 TODO 결제 요청 결과에 따라 핸들링하기
 		paymentService.createPayment(paymentResponse, command);
 	}
 
