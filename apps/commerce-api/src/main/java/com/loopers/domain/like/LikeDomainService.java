@@ -18,16 +18,17 @@ public class LikeDomainService {
 		return likeRepository.findByUserIdAndProductId(user.getId(), product.getId());
 	}
 
+	public Like getLikeOrCreate(Optional<Like> optionalLike, UserEntity user, Product product) {
+		if (optionalLike.isPresent()) {
+			return optionalLike.get();
+		}
+
+		Like like = Like.of(user.getId(), product.getId());
+		return likeRepository.save(like);
+	}
+
 	public List<ProductDetail> getLikedProducts(UserEntity user) {
 		return likeRepository.findLikedProducts(user.getId());
-	}
-
-	public Like getLikeOrCreate(Optional<Like> optionalLike, UserEntity user, Product product) {
-		return optionalLike.orElseGet(() -> Like.of(user.getId(), product.getId()));
-	}
-
-	public Like save(Like like) {
-		return likeRepository.save(like);
 	}
 
 }

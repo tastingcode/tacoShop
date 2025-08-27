@@ -31,10 +31,6 @@ public class LikeService {
 	private final LikeDomainService likeDomainService;
 	private final ApplicationEventPublisher eventPublisher;
 
-	@Retryable(
-			retryFor = ObjectOptimisticLockingFailureException.class,
-			maxAttempts = 5,
-			backoff = @Backoff(delay = 100))
 	@Transactional
 	public LikeInfo like(String userId, Long productId) {
 		UserEntity user = getValidatedUser(userId);
@@ -54,12 +50,8 @@ public class LikeService {
 		return LikeInfo.from(like);
 	}
 
-	@Retryable(
-			retryFor = ObjectOptimisticLockingFailureException.class,
-			maxAttempts = 5,
-			backoff = @Backoff(delay = 100))
 	@Transactional
-	public LikeInfo unLike(String userId, Long productId) {
+	public LikeInfo unlike(String userId, Long productId) {
 		UserEntity user = getValidatedUser(userId);
 		Product product = getValidatedProduct(productId);
 
