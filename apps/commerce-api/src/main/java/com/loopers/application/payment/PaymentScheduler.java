@@ -25,7 +25,7 @@ public class PaymentScheduler {
 				ZonedDateTime.now().minusMinutes(5)
 		);
 		for (Payment pendingPayment : pendingPayments) {
-			PaymentInfo.PaymentResponse paymentResponse = paymentGatewayPort.requestPaymentInfo(pendingPayment.getTransactionKey());
+			PaymentDto.PaymentResponse paymentResponse = paymentGatewayPort.requestPaymentInfo(pendingPayment.getTransactionKey());
 			PaymentStatus currentPaymentStatus = PaymentStatus.valueOf(paymentResponse.data().status());
 
 			if (currentPaymentStatus != PaymentStatus.PENDING)

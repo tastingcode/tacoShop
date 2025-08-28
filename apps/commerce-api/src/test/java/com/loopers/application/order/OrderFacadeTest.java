@@ -67,6 +67,7 @@ public class OrderFacadeTest {
 	private Brand brand;
 	private Product product1;
 	private Product product2;
+	private List<OrderProductCommand> orderProductCommands;
 	private List<OrderProduct> orderProducts;
 	private Coupon coupon;
 	private UserCoupon userCoupon;
@@ -95,11 +96,12 @@ public class OrderFacadeTest {
 		// 사용자 쿠폰 발급
 		userCoupon = createAndSaveUserCoupon(user.getId(), coupon.getId());
 
-		// 주문 상품 생성
-		orderProducts = createOrderProducts();
+		// 주문 상품 커맨드 생성
+		orderProductCommands = createOrderProductCommands();
+		orderProducts = OrderProductCommand.toOrderProducts(orderProductCommands);
 
 		// 주문 커맨드 생성
-		orderCommand = new OrderCommand(user.getUserId(), orderProducts, coupon.getId());
+		orderCommand = new OrderCommand(user.getUserId(), orderProductCommands, coupon.getId());
 
 		// 주문 총액 계산
 		orderPrice = orderDomainService.calculateTotalPrice(orderProducts);
@@ -122,21 +124,11 @@ public class OrderFacadeTest {
 		// when
 		OrderInfo orderInfo = orderFacade.createOrder(orderCommand);
 
-		Coupon foundCoupon = couponRepository.findByCouponId(coupon.getId()).orElseThrow();
-
-		UserCoupon foundUserCoupon = userCouponRepository.findByUserIdAndCouponId(user.getId(), coupon.getId()).orElseThrow();
-
-		Point point = pointRepository.findByUserId(user.getId()).orElseThrow();
-
 		// then
 		assertThat(orderInfo).isNotNull();
 		assertThat(orderInfo.finalPrice()).isEqualTo(finalPrice);
 		assertThat(orderInfo.discountAmount()).isEqualTo(discountAmount);
 		assertThat(orderInfo.status()).isEqualTo(OrderStatus.PENDING);
-		assertThat(foundCoupon.getStatus()).isEqualTo(CouponStatus.USED);
-		assertThat(foundUserCoupon.isUsed()).isTrue();
-		assertThat(point.getAmount()).isEqualTo(chargeAmount - finalPrice);
-
 	}
 
 	@DisplayName("사용 불가능하거나 존재하지 않는 쿠폰일 경우 주문은 실패해야 한다.")
@@ -144,7 +136,7 @@ public class OrderFacadeTest {
 	void 사용_불가능하거나_존재하지_않는_쿠폰일_경우_주문은_실패해야_한다() {
 		// arrange
 		Long notExistCouponId = -1L;
-		OrderCommand wrongOrderCommand = new OrderCommand(user.getUserId(), orderProducts, notExistCouponId);
+		OrderCommand wrongOrderCommand = new OrderCommand(user.getUserId(), orderProductCommands, notExistCouponId);
 
 		// act && assert
 		assertThatThrownBy(() -> orderFacade.createOrder(wrongOrderCommand))
@@ -158,12 +150,12 @@ public class OrderFacadeTest {
 		Product product1 = createAndSaveProduct("상품A", 3000, 0, brand.getId());
 		Product product2 = createAndSaveProduct("상품A", 3000, 0, brand.getId());
 
-		List<OrderProduct> orderProducts = List.of(
-				OrderProduct.of(null, product1.getId(), product1.getPrice(), 2),
-				OrderProduct.of(null, product2.getId(), product2.getPrice(), 2)
+		List<OrderProductCommand> orderProductCommands = List.of(
+				new OrderProductCommand(product1.getId(), product1.getPrice(), 2),
+				new OrderProductCommand(product2.getId(), product2.getPrice(), 2)
 		);
 
-		orderCommand = new OrderCommand(user.getUserId(), orderProducts, coupon.getId());
+		orderCommand = new OrderCommand(user.getUserId(), orderProductCommands, coupon.getId());
 
 		// act && assert
 		assertThatThrownBy(() -> orderFacade.createOrder(orderCommand))
@@ -186,7 +178,7 @@ public class OrderFacadeTest {
 		final int _10O0_POINT = 1000;
 		pointService.chargePoint(savedUser.getUserId(), _10O0_POINT).amount();
 
-		orderCommand = new OrderCommand(savedUser.getUserId(), orderProducts, coupon.getId());
+		orderCommand = new OrderCommand(savedUser.getUserId(), orderProductCommands, coupon.getId());
 
 		// act && assert
 		assertThatThrownBy(() -> orderFacade.createOrder(orderCommand))
@@ -248,14 +240,12 @@ public class OrderFacadeTest {
 		return userCoupon;
 	}
 
-	// 주문 상품 생성
-	private List<OrderProduct> createOrderProducts() {
-		List<OrderProduct> orderProducts = List.of(
-				OrderProduct.of(null, product1.getId(), product1.getPrice(), 2),
-				OrderProduct.of(null, product2.getId(), product2.getPrice(), 2)
+	// 주문 상품 커맨드 생성
+	private List<OrderProductCommand> createOrderProductCommands() {
+		return List.of(
+				new OrderProductCommand(product1.getId(), product1.getPrice(), 2),
+				new OrderProductCommand(product2.getId(), product2.getPrice(), 2)
 		);
-
-		return orderProducts;
 	}
 
 }

@@ -2,6 +2,7 @@ package com.loopers.interfaces.api.payment;
 
 import com.loopers.application.payment.PaymentCommand;
 import com.loopers.application.payment.PaymentFacade;
+import com.loopers.application.payment.PaymentInfo;
 import com.loopers.application.payment.PaymentService;
 import com.loopers.domain.payment.PaymentCallbackRequest;
 import com.loopers.interfaces.api.ApiResponse;
@@ -19,16 +20,12 @@ public class PaymentV1ApiController implements PaymentV1ApiSpec {
 
 	@PostMapping
 	@Override
-	public ApiResponse<Object> requestPayment(@RequestHeader("X-USER-ID") String userId, @RequestBody PaymentV1Dto.PaymentRequest paymentRequest) {
-		PaymentCommand paymentCommand = PaymentCommand.from(userId,
-				paymentRequest.orderId(),
-				paymentRequest.paymentType(),
-				paymentRequest.cardType(),
-				paymentRequest.cardNo(),
-				paymentRequest.amount());
-
-		paymentFacade.checkout(paymentCommand);
-		return ApiResponse.success();
+	public ApiResponse<PaymentV1Dto.PaymentResponse> requestPayment(@RequestHeader("X-USER-ID") String userId,
+											  @RequestBody PaymentV1Dto.PaymentRequest paymentRequest) {
+		PaymentCommand paymentCommand = paymentRequest.toCommand(userId);
+		PaymentInfo paymentInfo = paymentFacade.checkout(paymentCommand);
+		PaymentV1Dto.PaymentResponse response = PaymentV1Dto.PaymentResponse.from(paymentInfo);
+		return ApiResponse.success(response);
 	}
 
 	@PostMapping("/callback")
@@ -37,6 +34,5 @@ public class PaymentV1ApiController implements PaymentV1ApiSpec {
 		paymentFacade.callback(paymentCallbackRequest);
 		return ApiResponse.success();
 	}
-
 
 }

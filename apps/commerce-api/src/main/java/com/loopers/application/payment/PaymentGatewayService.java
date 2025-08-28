@@ -1,7 +1,7 @@
 package com.loopers.application.payment;
 
 import com.loopers.domain.payment.PaymentGatewayPort;
-import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.payment.PaymentDto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,8 @@ public class PaymentGatewayService {
 
 	private final PaymentGatewayPort paymentGatewayPort;
 
-	public PaymentInfo.PaymentResponse requestPayment(PaymentCommand command) {
-		PaymentInfo.PaymentRequest paymentRequest = PaymentInfo.PaymentRequest.of(command.orderId(),
+	public PaymentDto.PaymentResponse requestPayment(PaymentCommand command) {
+		PaymentDto.PaymentRequest paymentRequest = PaymentDto.PaymentRequest.of(command.orderId(),
 				command.paymentType(),
 				command.cardType(),
 				command.cardNo(),
@@ -26,7 +26,7 @@ public class PaymentGatewayService {
 	}
 
 	public void validatePaymentTransaction(String transactionKey) {
-		PaymentInfo.PaymentResponse paymentResponse = paymentGatewayPort.requestPaymentInfo(transactionKey);
+		PaymentDto.PaymentResponse paymentResponse = paymentGatewayPort.requestPaymentInfo(transactionKey);
 		if (paymentResponse.data() == null)
 			throw new CoreException(ErrorType.NOT_FOUND, "해당 트랜잭션의 결제 정보를 확인할 수 없습니다.");
 	}

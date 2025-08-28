@@ -2,7 +2,7 @@ package com.loopers.domain.payment;
 
 import com.loopers.infrastructure.payment.pg.PgDto;
 
-public class PaymentInfo {
+public class PaymentDto {
 	public record PaymentRequest(
 			Long orderId,
 			PaymentType paymentType,

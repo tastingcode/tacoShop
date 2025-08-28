@@ -44,25 +44,24 @@ public class OrderDomainService {
 		});
 	}
 
-	/**
-	 * 주문 아이템 리스트 검증
-	 */
-	public void validateOrderItems(List<OrderProduct> orderProducts, List<Product> products) {
+
+	// 주문 상품 유효성 및 재고 검증
+	public void validateOrderStock(List<OrderProduct> orderProducts, List<Product> products) {
 		for (OrderProduct orderProduct : orderProducts) {
 			Product product = products.stream()
 					.filter(item -> item.getId().equals(orderProduct.getProductId()))
 					.findFirst()
 					.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. 상품 ID: " + orderProduct.getProductId()));
-			validateOrderItem(orderProduct, product);
+			validateOrderProductStock(orderProduct, product);
 		}
 	}
 
-	private void validateOrderItem(OrderProduct orderItem, Product product) {
-		if (orderItem.getQuantity() <= 0) {
+	public void validateOrderProductStock(OrderProduct orderProduct, Product product) {
+		if (orderProduct.getQuantity() <= 0) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "주문 수량은 1 이상이어야 합니다.");
 		}
 
-		if (product.getStock() < orderItem.getQuantity()) {
+		if (product.getStock() < orderProduct.getQuantity()) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "재고가 부족합니다.");
 		}
 	}

@@ -59,7 +59,7 @@ public class LikeService {
 		Like like = likeDomainService.getLike(user, product)
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "좋아요 한 상품만 좋아요를 취소 할 수 있습니다."));
 
-		// 좋아요 취소 처리
+		// 좋아요 상태 true 일 때 좋아요 이벤트 발생
 		if (like.isLiked())
 			eventPublisher.publishEvent(ProductLikeEvent.of(like, LikeEventType.UNLIKE));
 

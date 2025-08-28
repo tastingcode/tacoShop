@@ -3,24 +3,28 @@ package com.loopers.application.payment;
 
 import com.loopers.domain.payment.Payment;
 import com.loopers.domain.payment.PaymentCallbackRequest;
-import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.payment.PaymentStrategy;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class PaymentFacade {
 	private final PaymentGatewayService paymentGatewayService;
 	private final PaymentService paymentService;
-	public void checkout(PaymentCommand command){
-		// 유저 유효성 검증
-		paymentService.validateOrder(command);
+	private final PaymentStrategyFactory paymentStrategyFactory;
 
-		// 결제 요청
-		PaymentInfo.PaymentResponse paymentResponse = paymentGatewayService.requestPayment(command);
+	public PaymentInfo checkout(PaymentCommand command) {
+		// 유저 주문 유효성 검증
+		paymentService.validateUserOrder(command);
 
-		// 결제 생성 TODO 결제 요청 결과에 따라 핸들링하기
-		paymentService.createPayment(paymentResponse, command);
+		// 결제 전략 선택
+		PaymentStrategy paymentStrategy = paymentStrategyFactory.getPaymentStrategy(command.paymentType());
+
+		// 결제
+		return paymentStrategy.pay(command);
 	}
 
 	public void callback(PaymentCallbackRequest paymentCallbackRequest) {
@@ -30,8 +34,8 @@ public class PaymentFacade {
 		// 결제 유효성 검증
 		Payment payment = paymentService.getValidatedPayment(paymentCallbackRequest);
 
-		// 결제 및 주문 업데이트
-		paymentService.updatePaymentAndOrder(payment, paymentCallbackRequest.status());
+		// 이벤트 기반 결제 및 주문 동기화
+		paymentService.syncPaymentOrder(payment, paymentCallbackRequest.status());
 	}
 
 }

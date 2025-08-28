@@ -14,13 +14,13 @@ public interface PaymentV1ApiSpec {
 
 	@PostMapping("/api/v1/payments")
 	@Operation(summary = "결제요청 API")
-	ApiResponse<Object> requestPayment(
+	ApiResponse<PaymentV1Dto.PaymentResponse> requestPayment(
 			@Schema(name = "X-USER-ID")
 			@RequestHeader(name = "X-USER-ID") String userId,
 			@RequestBody PaymentV1Dto.PaymentRequest paymentRequest
-			);
+	);
 
 	@PostMapping("/api/v1/payments/callback")
 	@Operation(summary = "콜백 API")
-	ApiResponse<Object> requestPaymentCallback(@RequestBody PaymentCallbackRequest/*String*/ paymentCallbackRequest);
+	ApiResponse<Object> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest);
 }

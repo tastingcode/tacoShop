@@ -1,7 +1,7 @@
 package com.loopers.infrastructure.payment.pg;
 
 import com.loopers.domain.payment.PaymentGatewayPort;
-import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.payment.PaymentDto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import feign.RetryableException;
@@ -26,22 +26,22 @@ public class LuckyPgAdapter implements PaymentGatewayPort {
 
 
 	@Override
-	@Retry(name = "pgRetry", fallbackMethod = "fallback")
+	@Retry(name = "pgRetry", fallbackMethod = "retryFallback")
 	@CircuitBreaker(name = "pgCircuit", fallbackMethod = "circuitFallback")
-	public PaymentInfo.PaymentResponse requestPayment(PaymentInfo.PaymentRequest paymentRequest) {
+	public PaymentDto.PaymentResponse requestPayment(PaymentDto.PaymentRequest paymentRequest) {
 		PgDto.PgRequest pgRequest = PgDto.PgRequest.from(paymentRequest, CALLBACK_URL);
 		PgDto.PgResponse pgResponse = luckyPgClient.requestPayment(MERCHANT_ID, pgRequest);
-		return PaymentInfo.PaymentResponse.of(pgResponse);
+		return PaymentDto.PaymentResponse.of(pgResponse);
 	}
 
 	@Override
 	@Retry(name = "pgRetry", fallbackMethod = "retryFallback")
-	public PaymentInfo.PaymentResponse requestPaymentInfo(String transactionKey) {
+	public PaymentDto.PaymentResponse requestPaymentInfo(String transactionKey) {
 		PgDto.PgResponse pgResponse = luckyPgClient.requestPaymentInfo(MERCHANT_ID, transactionKey);
-		return PaymentInfo.PaymentResponse.of(pgResponse);
+		return PaymentDto.PaymentResponse.of(pgResponse);
 	}
 
-	public PaymentInfo.PaymentResponse circuitFallback(PaymentInfo.PaymentRequest paymentRequest, Throwable t) {
+	public PaymentDto.PaymentResponse circuitFallback(PaymentDto.PaymentRequest paymentRequest, Throwable t) {
 		log.error("[CircuitFallback] - orderId={}, reason={}", paymentRequest.orderId(), t.getMessage());
 
 		log.error("LuckyPG 불가 -> 백업 PG 시도");
@@ -51,11 +51,11 @@ public class LuckyPgAdapter implements PaymentGatewayPort {
 	}
 
 
-	public PaymentInfo.PaymentResponse retryFallback(PaymentInfo.PaymentRequest paymentRequest, Throwable t) {
+	public PaymentDto.PaymentResponse retryFallback(PaymentDto.PaymentRequest paymentRequest, Throwable t) {
 		log.error("[RetryFallback] - orderId={}, reason={}", paymentRequest.orderId(), t.getMessage());
 		if (t instanceof RetryableException || t instanceof SocketTimeoutException) {
 			log.error("네트워크 지연으로 인한 결제 실패");
-			return PaymentInfo.PaymentResponse.fallback("네트워크 지연으로 인한 결제 실패, 잠시 후 다시 시도해주세요.");
+			return PaymentDto.PaymentResponse.fallback("네트워크 지연으로 인한 결제 실패, 잠시 후 다시 시도해주세요.");
 		}
 
 		throw new CoreException(ErrorType.INTERNAL_ERROR, "[RetryFallback] - PG 연동 중 오류 발생");

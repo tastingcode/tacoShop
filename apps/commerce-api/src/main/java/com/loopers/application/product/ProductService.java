@@ -42,7 +42,7 @@ public class ProductService {
 		}
 
 		// 상품 목록 조회
-		Page<ProductDetail> productDetailPage = productDomainService.getProducts(productQuery);
+		Page<ProductDetail> productDetailPage = productDomainService.getProductsByQuery(productQuery);
 		List<ProductInfo> productInfoList = productDetailPage.getContent().stream()
 				.map(ProductInfo::from)
 				.toList();
