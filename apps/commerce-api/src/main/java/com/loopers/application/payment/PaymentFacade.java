@@ -27,7 +27,7 @@ public class PaymentFacade {
 		return paymentStrategy.pay(command);
 	}
 
-	public void callback(PaymentCallbackRequest paymentCallbackRequest) {
+	public PaymentInfo callback(PaymentCallbackRequest paymentCallbackRequest) {
 		// 결제 트랜잭션 유효성 검증
 		paymentGatewayService.validatePaymentTransaction(paymentCallbackRequest.transactionKey());
 
@@ -35,7 +35,7 @@ public class PaymentFacade {
 		Payment payment = paymentService.getValidatedPayment(paymentCallbackRequest);
 
 		// 이벤트 기반 결제 및 주문 동기화
-		paymentService.syncPaymentOrder(payment, paymentCallbackRequest.status());
+		return paymentService.syncPaymentOrder(payment, paymentCallbackRequest.status());
 	}
 
 }

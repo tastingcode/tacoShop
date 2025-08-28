@@ -37,7 +37,7 @@ public class PaymentService {
 	}
 
 	@Transactional
-	public void syncPaymentOrder(Payment payment, PaymentStatus paymentStatus) {
+	public PaymentInfo syncPaymentOrder(Payment payment, PaymentStatus paymentStatus) {
 		// 주문 조회
 		Order order = orderDomainService.getOrder(payment.getOrderId());
 
@@ -51,6 +51,8 @@ public class PaymentService {
 
 		// 결제 상태 업데이트 (SUCCESS OR FAILED)
 		payment.updateStatus(paymentStatus);
+
+		return PaymentInfo.from(payment);
 	}
 
 	@Transactional(readOnly = true)

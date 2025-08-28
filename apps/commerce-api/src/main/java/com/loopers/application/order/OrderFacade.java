@@ -52,7 +52,7 @@ public class OrderFacade {
 		// 주문 상품 저장
 		orderDomainService.saveOrderItems(order, orderProducts);
 
-		// 주문 생성 이벤트 발행 TODO 다음 내용 이따 제거 하기 -> 1. 쿠폰 사용
+		// 주문 생성 이벤트 발행
 		eventPublisher.publishEvent(OrderCreatedEvent.from(order));
 
 		return OrderInfo.from(order);

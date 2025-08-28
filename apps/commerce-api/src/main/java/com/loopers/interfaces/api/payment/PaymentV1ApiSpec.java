@@ -22,5 +22,5 @@ public interface PaymentV1ApiSpec {
 
 	@PostMapping("/api/v1/payments/callback")
 	@Operation(summary = "콜백 API")
-	ApiResponse<Object> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest);
+	ApiResponse<PaymentV1Dto.PaymentResponse> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest);
 }

@@ -30,9 +30,9 @@ public class PaymentV1ApiController implements PaymentV1ApiSpec {
 
 	@PostMapping("/callback")
 	@Override
-	public ApiResponse<Object> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest) {
-		paymentFacade.callback(paymentCallbackRequest);
-		return ApiResponse.success();
+	public ApiResponse<PaymentV1Dto.PaymentResponse> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest) {
+		PaymentInfo paymentInfo = paymentFacade.callback(paymentCallbackRequest);
+		PaymentV1Dto.PaymentResponse response = PaymentV1Dto.PaymentResponse.from(paymentInfo);
+		return ApiResponse.success(response);
 	}
-
 }

@@ -1,12 +1,9 @@
 package com.loopers.application.coupon.event;
 
 import com.loopers.application.coupon.CouponService;
-import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderDomainService;
 import com.loopers.domain.order.event.OrderCreatedEvent;
-import com.loopers.domain.payment.event.PaymentRequestFailEvent;
 import com.loopers.domain.user.UserDomainService;
-import com.loopers.domain.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +28,5 @@ public class CouponEventHandler {
 		Long couponId = orderDomainService.getOrder(orderId).getCouponId();
 		couponService.restoreCoupon(id, couponId);
 	}
-
 
 }
