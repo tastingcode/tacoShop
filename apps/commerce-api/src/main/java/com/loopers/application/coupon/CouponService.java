@@ -38,6 +38,14 @@ public class CouponService {
 		couponDomainService.useCoupon(coupon, userCoupon);
 	}
 
+	@Transactional
+	public void restoreCoupon(Long userId, Long couponId) {
+		Coupon coupon = getCouponById(couponId);
+		UserCoupon userCoupon = getUserCouponByUserIdAndCouponId(userId, couponId);
+
+		couponDomainService.restoreCoupon(coupon, userCoupon);
+	}
+
 	public Coupon getCouponById(Long couponId) {
 		return couponRepository.findByCouponId(couponId)
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "유효하지 않은 쿠폰입니다."));
@@ -46,13 +54,6 @@ public class CouponService {
 	public UserCoupon getUserCouponByUserIdAndCouponId(Long userId , Long couponId) {
 		return userCouponRepository.findByUserIdAndCouponId(userId, couponId)
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "유저 쿠폰이 존재하지 않습니다."));
-	}
-
-
-	public UserCoupon createUserCoupon(UserEntity user, Coupon coupon) {
-		UserCoupon userCoupon = UserCoupon.of(user.getId(), coupon.getId());
-		coupon.updateStatus(CouponStatus.ISSUED);
-		return userCoupon;
 	}
 
 }

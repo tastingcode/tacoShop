@@ -2,9 +2,7 @@ package com.loopers.domain.order;
 
 
 import com.loopers.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +13,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderProduct extends BaseEntity {
-	@Column(name = "ref_order_id")
-	private Long orderId;
+	@ManyToOne
+	@JoinColumn(name = "ref_order_id")
+	private Order order;
+
 	@Column(name = "ref_product_id", nullable = false)
 	private Long productId;
 	@Column(nullable = false)
@@ -24,9 +24,9 @@ public class OrderProduct extends BaseEntity {
 	@Column(nullable = false)
 	private int quantity;
 
-	public static OrderProduct of(Long orderId, Long productId, int price, int quantity) {
+	public static OrderProduct of(Order order, Long productId, int price, int quantity) {
 		OrderProduct orderProduct = new OrderProduct();
-		orderProduct.orderId = orderId;
+		orderProduct.order = order;
 		orderProduct.productId = productId;
 		orderProduct.price = price;
 		orderProduct.quantity = quantity;
