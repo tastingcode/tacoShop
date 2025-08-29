@@ -1,12 +1,11 @@
 package com.loopers.application.order.event;
 
+import com.loopers.domain.dataplatform.DataPlatformPort;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderDomainService;
 import com.loopers.domain.order.OrderProduct;
 import com.loopers.domain.order.OrderStatus;
-import com.loopers.domain.payment.event.PaymentOrderFailEvent;
 import com.loopers.domain.payment.event.PaymentOrderSuccessEvent;
-import com.loopers.domain.payment.event.PaymentRequestFailEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderEventHandler {
 	private final OrderDomainService orderDomainService;
+	private final DataPlatformPort dataPlatformPort;
 
 	@Transactional
 	public void failOrder(Long orderId) {

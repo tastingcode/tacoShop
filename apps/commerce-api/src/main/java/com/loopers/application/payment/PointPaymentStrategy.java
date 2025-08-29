@@ -7,10 +7,12 @@ import com.loopers.domain.payment.PaymentStrategy;
 import com.loopers.domain.payment.event.PaymentOrderFailEvent;
 import com.loopers.domain.payment.event.PaymentOrderSuccessEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PointPaymentStrategy implements PaymentStrategy {
@@ -29,22 +31,23 @@ public class PointPaymentStrategy implements PaymentStrategy {
 			// 포인트 사용
 			pointService.useMyPoint(command.userId(), command.amount());
 
-			// 결제 성공 이벤트 발행
-			eventPublisher.publishEvent(PaymentOrderSuccessEvent.of(command.userId(), command.orderId()));
-
 			// 결제 성공
 			isSuccessPaymentOrder = true;
 		}catch (Exception e) {
-			// 결제 실패 이벤트 발행
-			eventPublisher.publishEvent(PaymentOrderFailEvent.of(command.userId(), command.orderId()));
+			log.error("포인트 결제 중 에러가 발생하였습니다.: {}", e.getMessage());
 		}
 
 		// 결제 생성
 		Payment payment;
 		if (isSuccessPaymentOrder) {
 			payment = paymentService.createPayment(null, command, PaymentStatus.SUCCESS);
-		} else {
+			// 결제 성공 이벤트 발행
+			eventPublisher.publishEvent(PaymentOrderSuccessEvent.of(payment.getId(), command.userId(), command.orderId()));
+		}
+		else {
 			payment = paymentService.createPayment(null, command, PaymentStatus.FAILED);
+			// 결제 실패 이벤트 발행
+			eventPublisher.publishEvent(PaymentOrderFailEvent.of(payment.getId(), command.userId(), command.orderId()));
 		}
 
 		return PaymentInfo.from(payment);

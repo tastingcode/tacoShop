@@ -43,11 +43,11 @@ public class PaymentService {
 
 		// 결제 성공
 		if (paymentStatus.equals(PaymentStatus.SUCCESS))
-			eventPublisher.publishEvent(PaymentOrderSuccessEvent.of(payment.getUserId(), order.getId()));
+			eventPublisher.publishEvent(PaymentOrderSuccessEvent.of(payment.getId(), payment.getUserId(), order.getId()));
 
 		// 결제 실패
 		if (paymentStatus.equals(PaymentStatus.SUCCESS))
-			eventPublisher.publishEvent(PaymentOrderFailEvent.of(payment.getUserId(), order.getId()));
+			eventPublisher.publishEvent(PaymentOrderFailEvent.of(payment.getId(), payment.getUserId(), order.getId()));
 
 		// 결제 상태 업데이트 (SUCCESS OR FAILED)
 		payment.updateStatus(paymentStatus);
