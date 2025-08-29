@@ -28,9 +28,10 @@ public class UserDomainService {
         return UserInfo.from(user);
     }
 
-    @Transactional(readOnly = true)
-    public UserEntity getUser(String userId) {
-        return userRepository.findByUserId(userId).orElse(null);
+
+    public UserEntity getUserByUserId(String userId) {
+        return userRepository.findByUserId(userId)
+				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "해당 아이디를 가진 사용자를 찾을 수 없습니다."));
     }
 
 }

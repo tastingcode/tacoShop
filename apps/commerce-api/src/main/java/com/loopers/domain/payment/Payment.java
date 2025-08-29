@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Payment extends BaseEntity {
 	private String transactionKey;
+	private String userId;
 	private Long orderId;
 	private int amount;
 	@Enumerated(EnumType.STRING)
@@ -22,12 +23,14 @@ public class Payment extends BaseEntity {
 	private PaymentStatus paymentStatus;
 
 	public static Payment of(String transactionKey,
+							 String userId,
 							 Long orderId,
 							 int amount,
 							 PaymentType paymentType,
 							 PaymentStatus paymentStatus) {
 		Payment payment = new Payment();
 		payment.transactionKey = transactionKey;
+		payment.userId = userId;
 		payment.orderId = orderId;
 		payment.amount = amount;
 		payment.paymentType = paymentType;

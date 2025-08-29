@@ -29,6 +29,13 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+logging:
+  level:
+    io.github.resilience4j: DEBUG
+    org.springframework.retry: DEBUG
+    org.springframework.aop: DEBUG
+    com.loopers.infrastructure.payment.pg.LuckyPgAdapter: DEBUG
+
 resilience4j:
   retry:
     instances:

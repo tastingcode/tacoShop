@@ -18,7 +18,7 @@ public class UserService {
 	}
 
     public UserInfo getUserInfo(String userId) {
-        UserEntity user = userDomainService.getUser(userId);
+        UserEntity user = userDomainService.getUserByUserId(userId);
         if (user == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }

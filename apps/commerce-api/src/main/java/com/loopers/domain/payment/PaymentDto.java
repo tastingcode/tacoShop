@@ -2,7 +2,7 @@ package com.loopers.domain.payment;
 
 import com.loopers.infrastructure.payment.pg.PgDto;
 
-public class PaymentInfo {
+public class PaymentDto {
 	public record PaymentRequest(
 			Long orderId,
 			PaymentType paymentType,
@@ -51,8 +51,8 @@ public class PaymentInfo {
 			return new PaymentResponse(Meta.of(pgResponse), Data.of(pgResponse));
 		}
 
-		public static PaymentResponse fallback(){
-			Meta meta = new Meta("fail", null, null);
+		public static PaymentResponse fallback(String message){
+			Meta meta = new Meta("FAIL", null, message);
 			Data data = new Data(null, null, null);
 			return new PaymentResponse(meta, data);
 		}

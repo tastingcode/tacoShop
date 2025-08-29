@@ -40,4 +40,8 @@ public class UserCoupon extends BaseEntity {
 		this.used = true;
 	}
 
+	public void restoreCoupon() {
+		this.used = false;
+	}
+
 }

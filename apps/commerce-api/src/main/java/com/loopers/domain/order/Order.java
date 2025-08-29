@@ -31,10 +31,13 @@ public class Order extends BaseEntity {
 	@Column(name = "discount_amount")
 	private int discountAmount;
 
-	@Transient
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
 	private List<OrderProduct> orderProducts = new ArrayList<>();
 
-	public static Order create(UserEntity user, List<OrderProduct> orderProducts, int orderPrice, int discountAmount) {
+	@Column(name = "ref_coupon_id")
+	private Long couponId;
+
+	public static Order create(UserEntity user, List<OrderProduct> orderProducts, int orderPrice, int discountAmount, Long couponId) {
 		Order order = new Order();
 		for (OrderProduct orderProduct : orderProducts) {
 			order.addProduct(orderProduct);
@@ -45,6 +48,7 @@ public class Order extends BaseEntity {
 		order.status = OrderStatus.PENDING;
 		order.finalPrice = orderPrice - discountAmount;
 		order.discountAmount = discountAmount;
+		order.couponId = couponId;
 		return order;
 	}
 

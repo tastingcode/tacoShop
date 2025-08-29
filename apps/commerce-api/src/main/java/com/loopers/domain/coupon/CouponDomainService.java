@@ -18,5 +18,10 @@ public class CouponDomainService {
 		coupon.updateStatus(CouponStatus.USED);
 		userCoupon.useCoupon();
 	}
+
+	public void restoreCoupon(Coupon coupon, UserCoupon userCoupon) {
+		coupon.updateStatus(CouponStatus.ACTIVE);
+		userCoupon.restoreCoupon();
+	}
 }
 

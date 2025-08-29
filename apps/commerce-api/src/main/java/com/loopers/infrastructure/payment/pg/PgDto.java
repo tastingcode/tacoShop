@@ -2,7 +2,7 @@ package com.loopers.infrastructure.payment.pg;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.loopers.domain.payment.CardType;
-import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.payment.PaymentDto;
 
 public class PgDto {
 
@@ -13,7 +13,7 @@ public class PgDto {
 			@JsonProperty("amount") int finalPrice,
 			String callbackUrl
 	){
-		public static PgRequest from(PaymentInfo.PaymentRequest paymentRequest, String callbackUrl) {
+		public static PgRequest from(PaymentDto.PaymentRequest paymentRequest, String callbackUrl) {
 			return new PgRequest(String.valueOf(paymentRequest.orderId()),
 					paymentRequest.cardType(),
 					paymentRequest.cardNo(),

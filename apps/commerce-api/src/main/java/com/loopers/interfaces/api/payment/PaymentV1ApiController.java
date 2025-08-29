@@ -1,6 +1,8 @@
 package com.loopers.interfaces.api.payment;
 
 import com.loopers.application.payment.PaymentCommand;
+import com.loopers.application.payment.PaymentFacade;
+import com.loopers.application.payment.PaymentInfo;
 import com.loopers.application.payment.PaymentService;
 import com.loopers.domain.payment.PaymentCallbackRequest;
 import com.loopers.interfaces.api.ApiResponse;
@@ -12,32 +14,25 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/payments")
-public class PaymentV1ApiController implements PaymentV1ApiSpec{
+public class PaymentV1ApiController implements PaymentV1ApiSpec {
 
-	private final PaymentService paymentService;
-
+	private final PaymentFacade paymentFacade;
 
 	@PostMapping
 	@Override
-	public ApiResponse<Object> requestPayment(@RequestHeader("X-USER-ID") String userId, @RequestBody PaymentV1Dto.PaymentRequest paymentRequest) {
-		PaymentCommand paymentCommand = PaymentCommand.from(userId,
-				paymentRequest.orderId(),
-				paymentRequest.paymentType(),
-				paymentRequest.cardType(),
-				paymentRequest.cardNo(),
-				paymentRequest.amount());
-
-		paymentService.checkOut(paymentCommand);
-
-		return ApiResponse.success();
+	public ApiResponse<PaymentV1Dto.PaymentResponse> requestPayment(@RequestHeader("X-USER-ID") String userId,
+											  @RequestBody PaymentV1Dto.PaymentRequest paymentRequest) {
+		PaymentCommand paymentCommand = paymentRequest.toCommand(userId);
+		PaymentInfo paymentInfo = paymentFacade.checkout(paymentCommand);
+		PaymentV1Dto.PaymentResponse response = PaymentV1Dto.PaymentResponse.from(paymentInfo);
+		return ApiResponse.success(response);
 	}
 
 	@PostMapping("/callback")
 	@Override
-	public ApiResponse<Object> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest) {
-		paymentService.callBack(paymentCallbackRequest);
-		return ApiResponse.success();
+	public ApiResponse<PaymentV1Dto.PaymentResponse> requestPaymentCallback(@RequestBody PaymentCallbackRequest paymentCallbackRequest) {
+		PaymentInfo paymentInfo = paymentFacade.callback(paymentCallbackRequest);
+		PaymentV1Dto.PaymentResponse response = PaymentV1Dto.PaymentResponse.from(paymentInfo);
+		return ApiResponse.success(response);
 	}
-
-
 }

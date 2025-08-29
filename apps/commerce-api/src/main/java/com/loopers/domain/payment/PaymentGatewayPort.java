@@ -1,7 +1,7 @@
 package com.loopers.domain.payment;
 
 public interface PaymentGatewayPort {
-	PaymentInfo.PaymentResponse requestPayment(PaymentInfo.PaymentRequest paymentRequest);
+	PaymentDto.PaymentResponse requestPayment(PaymentDto.PaymentRequest paymentRequest);
 
-	PaymentInfo.PaymentResponse requestPaymentInfo(String transactionKey);
+	PaymentDto.PaymentResponse requestPaymentInfo(String transactionKey);
 }
