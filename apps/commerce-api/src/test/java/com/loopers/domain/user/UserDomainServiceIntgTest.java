@@ -142,7 +142,7 @@ public class UserDomainServiceIntgTest {
             );
 
             // act
-            UserEntity user = userDomainService.getUser(savedUser.getUserId());
+            UserEntity user = userDomainService.getUserByUserId(savedUser.getUserId());
 
             // assert
             assertAll(
@@ -158,12 +158,9 @@ public class UserDomainServiceIntgTest {
             // arrange
             String invalidUsedId = "emptyUserId";
 
-            // act
-            UserEntity user = userDomainService.getUser(invalidUsedId);
+            // act && assert
+			assertThrows(CoreException.class, () -> userDomainService.getUserByUserId(invalidUsedId));
 
-
-            // assert
-            assertThat(user).isNull();
         }
     }
 
