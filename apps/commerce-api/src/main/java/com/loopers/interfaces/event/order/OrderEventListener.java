@@ -22,13 +22,11 @@ public class OrderEventListener {
 		orderEventHandler.failOrder(event.orderId());
 	}
 
-	@Async
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void handlePaymentOrderSuccessEvent(PaymentOrderSuccessEvent event){
 		orderEventHandler.completeOrder(event);
 	}
 
-	@Async
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void handlePaymentOrderFailEvent(PaymentOrderFailEvent event){
 		orderEventHandler.failOrder(event.orderId());

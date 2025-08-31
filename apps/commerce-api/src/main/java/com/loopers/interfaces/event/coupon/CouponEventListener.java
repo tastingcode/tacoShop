@@ -29,7 +29,6 @@ public class CouponEventListener {
 		couponEventHandler.restoreCoupon(event.userId(), event.orderId());
 	}
 
-	@Async
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void handlePaymentOrderFailEvent(PaymentOrderFailEvent event) {
 		couponEventHandler.restoreCoupon(event.userId(), event.orderId());
