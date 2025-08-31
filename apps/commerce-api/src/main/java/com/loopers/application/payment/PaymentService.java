@@ -46,7 +46,7 @@ public class PaymentService {
 			eventPublisher.publishEvent(PaymentOrderSuccessEvent.of(payment.getId(), payment.getUserId(), order.getId()));
 
 		// 결제 실패
-		if (paymentStatus.equals(PaymentStatus.SUCCESS))
+		if (paymentStatus.equals(PaymentStatus.FAILED))
 			eventPublisher.publishEvent(PaymentOrderFailEvent.of(payment.getId(), payment.getUserId(), order.getId()));
 
 		// 결제 상태 업데이트 (SUCCESS OR FAILED)
