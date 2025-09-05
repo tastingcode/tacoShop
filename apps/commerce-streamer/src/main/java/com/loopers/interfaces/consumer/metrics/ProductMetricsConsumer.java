@@ -2,14 +2,10 @@ package com.loopers.interfaces.consumer.metrics;
 
 import com.loopers.application.metrics.ProductMetricsCommand;
 import com.loopers.application.metrics.ProductMetricsService;
-import com.loopers.confg.kafka.KafkaConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -21,14 +17,11 @@ public class ProductMetricsConsumer {
 	@KafkaListener(
 			topics = "${kafka.topic.product-metrics}",
 			groupId = "${kafka.group.product-metrics-group-id}",
-			containerFactory = KafkaConfig.BATCH_LISTENER
+			concurrency = "3"
 	)
-	public void consume(List<ProductMetricsDto> records) {
-		List<ProductMetricsCommand> commands = records.stream()
-				.map(ProductMetricsDto::toCommand)
-				.toList();
-
-		productMetricsService.handleMetrics(commands);
+	public void consume(ProductMetricsDto productMetricsDto) {
+		ProductMetricsCommand command = productMetricsDto.toCommand();
+		productMetricsService.handleMetrics(command);
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.loopers.domain.metrics;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Table(name = "product_metrics")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductMetrics {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,25 +19,34 @@ public class ProductMetrics {
 	@Column(name = "product_id", nullable = false)
 	private Long productId;
 
-	@Column(name = "event_type", nullable = false)
-	private String eventType;
+	@Column(name = "likes_delta")
+	private int likesDelta;
 
-	@Enumerated(EnumType.STRING)
-	private ProductMetricType productMetricType;
+	@Column(name = "sales_delta")
+	private int salesDelta;
 
-	private int delta;
+	@Column(name = "views_delta")
+	private int viewsDelta;
 
 	private LocalDate date;
 
-
-	public static ProductMetrics create(Long ProductId, String eventType, ProductMetricType productMetricType, int delta){
+	public static ProductMetrics of(Long productId){
 		ProductMetrics productMetrics = new ProductMetrics();
-		productMetrics.productId = ProductId;
-		productMetrics.eventType = eventType;
-		productMetrics.productMetricType = productMetricType;
-		productMetrics.delta = delta;
+		productMetrics.productId = productId;
 		productMetrics.date = LocalDate.now();
 		return productMetrics;
+	}
+
+	public void adjustLikesDelta(int delta){
+		this.likesDelta += delta;
+	}
+
+	public void increaseSalesDelta(int delta){
+		this.salesDelta += delta;
+	}
+
+	public void increaseViewsDelta(int delta){
+		this.viewsDelta += delta;
 	}
 
 }

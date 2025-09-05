@@ -1,6 +1,5 @@
 package com.loopers.application.metrics;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.domain.like.event.LikeEventType;
 import com.loopers.domain.like.event.ProductLikeEvent;
 import com.loopers.domain.order.Order;
