@@ -1,6 +1,7 @@
 package com.loopers.confg.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -8,19 +9,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.converter.BatchMessagingMessageConverter;
 import org.springframework.kafka.support.converter.ByteArrayJsonMessageConverter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @EnableKafka
 @Configuration
 @EnableConfigurationProperties(KafkaProperties.class)
 public class KafkaConfig {
     public static final String BATCH_LISTENER = "BATCH_LISTENER_DEFAULT";
+	public static final String STRING_BATCH_LISTENER = "STRING_BATCH_LISTENER_DEFAULT";
 
     public static final int MAX_POLLING_SIZE = 3000; // read 3000 msg
     public static final int FETCH_MIN_BYTES = (1024 * 1024); // 1mb
@@ -28,6 +33,12 @@ public class KafkaConfig {
     public static final int SESSION_TIMEOUT_MS = 60 * 1000; // session timeout = 1m
     public static final int HEARTBEAT_INTERVAL_MS = 20 * 1000; // heartbeat interval = 20s ( 1/3 of session_timeout )
     public static final int MAX_POLL_INTERVAL_MS = 2 * 60 * 1000; // max poll interval = 2m
+
+	private static final int PARTITIONS = 3;
+	private static final int REPLICAS = 1;
+	private static final List<String> TOPIC_LIST = List.of(
+			"audit.topic-v1", "product.metrics-v1"
+	);
 
     @Bean
     public ProducerFactory<Object, Object> producerFactory(KafkaProperties kafkaProperties) {
@@ -72,4 +83,56 @@ public class KafkaConfig {
         factory.setBatchListener(true);
         return factory;
     }
+
+	@Bean
+	public ProducerFactory<String, String> stringProducerFactory(KafkaProperties kafkaProperties) {
+		Map<String, Object> props = new HashMap<>(kafkaProperties.buildProducerProperties());
+		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		return new DefaultKafkaProducerFactory<>(props);
+	}
+
+	@Bean
+	public KafkaTemplate<String, String> stringKafkaTemplate(ProducerFactory<String, String> stringProducerFactory) {
+		return new KafkaTemplate<>(stringProducerFactory);
+	}
+
+	@Bean
+	public ConsumerFactory<String, String> stringConsumerFactory(KafkaProperties kafkaProperties) {
+		Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		return new DefaultKafkaConsumerFactory<>(props);
+	}
+
+	@Bean(name = STRING_BATCH_LISTENER)
+	public ConcurrentKafkaListenerContainerFactory<String, String> stringBatchListenerContainerFactory(
+			KafkaProperties kafkaProperties
+	) {
+		Map<String, Object> consumerConfig = new HashMap<>(kafkaProperties.buildConsumerProperties());
+		consumerConfig.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POLLING_SIZE);
+		consumerConfig.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, FETCH_MIN_BYTES);
+		consumerConfig.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, FETCH_MAX_WAIT_MS);
+		consumerConfig.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, SESSION_TIMEOUT_MS);
+		consumerConfig.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, HEARTBEAT_INTERVAL_MS);
+		consumerConfig.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, MAX_POLL_INTERVAL_MS);
+
+		ConcurrentKafkaListenerContainerFactory<String, String> factory =
+				new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerConfig));
+		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+		factory.setConcurrency(3);
+		factory.setBatchListener(true);
+		return factory;
+	}
+
+	@Bean
+	public List<NewTopic> createKafkaTopics() {
+		return TOPIC_LIST.stream()
+				.map(name -> TopicBuilder.name(name)
+						.partitions(PARTITIONS)
+						.replicas(REPLICAS)
+						.build())
+				.collect(Collectors.toList());
+	}
 }

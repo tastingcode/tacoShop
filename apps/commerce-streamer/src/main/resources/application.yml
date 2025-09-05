@@ -1,4 +1,5 @@
 server:
+  port: 8084
   shutdown: graceful
   tomcat:
     threads:
@@ -10,11 +11,12 @@ server:
     keep-alive-timeout: 60s # 60s
   max-http-request-header-size: 8KB
 
+
 spring:
   main:
     web-application-type: servlet
   application:
-    name: commerce-api
+    name: commerce-streamer
   profiles:
     active: local
   config:
@@ -23,11 +25,18 @@ spring:
       - redis.yml
       - kafka.yml
       - logging.yml
-      - monitoring.yml
 
 demo-kafka:
   test:
     topic-name: demo.internal.topic-v1
+
+kafka:
+  topic:
+    audit-topic-name: audit.topic-v1
+    product-metrics: product.metrics-v1
+  group:
+    audit-topic-group-id: audit.topic-group
+    product-metrics-group-id: product.metrics-group
 
 ---
 spring:
