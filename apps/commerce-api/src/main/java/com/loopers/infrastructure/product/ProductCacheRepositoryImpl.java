@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +30,11 @@ public class ProductCacheRepositoryImpl implements ProductCacheRepository {
 	@Override
 	public <T> void set(String key, T value) throws JsonProcessingException {
 		set(key, value, Duration.ofMinutes(5));
+	}
+
+	@Override
+	public void delete(List<String> keys) {
+		redisTemplate.delete(keys);
 	}
 
 
