@@ -40,7 +40,7 @@ public class ProductLikeEventHandler {
 		productRepository.save(product);
 	}
 
-	public void handleLikeCache(){
+	public void cacheClearByLikeChanged(){
 		List<String> keys = List.of(
 				"product-list-sortType:likes_desc-page:0-size:10",
 				"product-list-sortType:likes_desc-page:1-size:10"

@@ -21,6 +21,6 @@ public class ProductEventListener {
 		productLikeEventHandler.updateLikeCount(event);
 
 		// 좋아요 수 캐시 무효화
-		productLikeEventHandler.likeChanged();
+		productLikeEventHandler.cacheClearByLikeChanged();
 	}
 }

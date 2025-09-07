@@ -22,8 +22,6 @@ public class AuditLogEventListener {
 	@Value( "${kafka.topic.audit-topic-name}")
 	private String auditTopic;
 
-	private final String EVENT_HEADER_KEY = "eventType";
-
 	private final ObjectMapper objectMapper;
 	private final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -34,8 +32,10 @@ public class AuditLogEventListener {
 		try {
 			String payload = objectMapper.writeValueAsString(event);
 			String eventType = event.getEventType();
+			String eventId = event.eventId();
 			ProducerRecord<String, String> record = new ProducerRecord<>(auditTopic, payload);
-			record.headers().add(EVENT_HEADER_KEY, eventType.getBytes(StandardCharsets.UTF_8));
+			record.headers().add("eventType", eventType.getBytes(StandardCharsets.UTF_8));
+			record.headers().add("eventId", eventId.getBytes(StandardCharsets.UTF_8));
 			kafkaTemplate.send(record);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException("Failed to serialize event");

@@ -27,7 +27,7 @@ public class ProductMetricsEventHandler {
 
 	public void handleLikeMetrics(ProductLikeEvent event){
 		int delta = event.likeEventType().equals(LikeEventType.LIKE) ? 1 : -1;
-		ProductMetricsCommand productMetricsCommand = ProductMetricsCommand.of(event.productId(), event.getEventType(), delta);
+		ProductMetricsCommand productMetricsCommand = ProductMetricsCommand.of(event.eventId(), event.productId(), event.getEventType(), delta);
 
 		sendMetrics(productMetricsCommand);
 	}
@@ -36,7 +36,7 @@ public class ProductMetricsEventHandler {
 		Order order = orderDomainService.getOrder(event.orderId());
 		List<OrderProduct> orderProducts = order.getOrderProducts();
 		List<ProductMetricsCommand> productMetricsCommandList = orderProducts.stream()
-				.map(item -> ProductMetricsCommand.of(item.getProductId(), event.getEventType(), item.getQuantity()))
+				.map(item -> ProductMetricsCommand.of(event.eventId(), item.getProductId(), event.getEventType(), item.getQuantity()))
 				.toList();
 
 		for (ProductMetricsCommand productMetricsCommand : productMetricsCommandList) {
@@ -45,7 +45,7 @@ public class ProductMetricsEventHandler {
 	}
 
 	public void handleViewMetrics(ProductViewedEvent event){
-		ProductMetricsCommand productMetricsCommand = ProductMetricsCommand.of(event.productId(), event.getEventType(), 1);
+		ProductMetricsCommand productMetricsCommand = ProductMetricsCommand.of(event.eventId(), event.productId(), event.getEventType(), 1);
 
 		sendMetrics(productMetricsCommand);
 	}
