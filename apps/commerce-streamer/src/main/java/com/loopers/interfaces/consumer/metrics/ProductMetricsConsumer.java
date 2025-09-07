@@ -5,6 +5,7 @@ import com.loopers.application.metrics.ProductMetricsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -19,9 +20,10 @@ public class ProductMetricsConsumer {
 			groupId = "${kafka.group.product-metrics-group-id}",
 			concurrency = "3"
 	)
-	public void consume(ProductMetricsDto productMetricsDto) {
+	public void consume(ProductMetricsDto productMetricsDto, Acknowledgment ack) {
 		ProductMetricsCommand command = productMetricsDto.toCommand();
 		productMetricsService.handleMetrics(command);
+		ack.acknowledge();
 	}
 
 }

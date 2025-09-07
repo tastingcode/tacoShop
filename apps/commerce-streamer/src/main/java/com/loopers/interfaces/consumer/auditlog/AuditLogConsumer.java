@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -24,15 +25,17 @@ public class AuditLogConsumer {
 			groupId = "${kafka.group.audit-topic-group-id}",
 			containerFactory = KafkaConfig.STRING_BATCH_LISTENER
 	)
-	public void consume(List<ConsumerRecord<String, String>> records) {
+	public void consume(List<ConsumerRecord<String, String>> records, Acknowledgment ack) {
 		List<AuditLogCommand> commands = records.stream()
 				.map(record -> {
 					String payload = record.value();
 					String eventType = new String(record.headers().lastHeader("eventType").value(), StandardCharsets.UTF_8);
-					return AuditLogCommand.of(eventType, payload);
+					String eventId = new String(record.headers().lastHeader("eventId").value(), StandardCharsets.UTF_8);
+					return AuditLogCommand.of(eventId, eventType, payload);
 				})
 				.toList();
 
 		auditLogService.saveAuditLog(commands);
+		ack.acknowledge();
 	}
 }
