@@ -17,6 +17,10 @@ public class ProductEventListener {
 	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleProductLikeEvent(ProductLikeEvent event){
+		// 좋아요 수 업데이트
 		productLikeEventHandler.updateLikeCount(event);
+
+		// 좋아요 수 캐시 무효화
+		productLikeEventHandler.cacheClearByLikeChanged();
 	}
 }

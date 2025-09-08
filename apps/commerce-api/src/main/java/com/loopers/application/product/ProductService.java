@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandDomainService;
 import com.loopers.domain.product.*;
+import com.loopers.domain.product.event.ProductViewedEvent;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class ProductService {
 	private final BrandDomainService brandDomainService;
 	private final ProductCacheRepository productCacheRepository;
 	private final ObjectMapper objectMapper;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional(readOnly = true)
 	public ProductListInfo getProductList(ProductQuery productQuery) {
@@ -67,6 +70,8 @@ public class ProductService {
 		Brand brand = brandDomainService.getBrand(product.getBrandId()).orElse(null);
 
 		ProductDetail productDetail = productDomainService.assembleProductDetail(product, brand);
+		eventPublisher.publishEvent(ProductViewedEvent.of(productId));
+
 		return ProductInfo.from(productDetail);
 	}
 }

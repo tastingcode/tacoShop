@@ -23,6 +23,7 @@ spring:
       - redis.yml
       - logging.yml
       - monitoring.yml
+      - kafka.yml
 
 springdoc:
   use-fqn: true
@@ -59,6 +60,11 @@ resilience4j:
         minimum-number-of-calls: 10 # 최소 호출
         wait-duration-in-open-state: 5s # 오픈 상태에서 대기 시간
         permitted-number-of-calls-in-half-open-state: 3 # HALF_OPEN 상태에서 호출 허용 수
+
+kafka:
+  topic:
+    audit-topic-name: audit.topic-v1
+    product-metrics: product.metrics-v1
 
 ---
 spring:
