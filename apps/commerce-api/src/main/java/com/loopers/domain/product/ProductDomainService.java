@@ -1,6 +1,7 @@
 package com.loopers.domain.product;
 
 import com.loopers.application.product.ProductQuery;
+import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.order.OrderProduct;
 import com.loopers.support.error.CoreException;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -24,6 +28,7 @@ public class ProductDomainService {
 	public Page<ProductDetail> getProductsByQuery(ProductQuery productQuery) {
 		return productRepository.findProductsWithBrand(productQuery);
 	}
+
 	public List<Product> getProductsByOrderProducts(List<OrderProduct> orderProducts) {
 		List<Long> productIds = orderProducts.stream()
 				.map(OrderProduct::getProductId)
@@ -33,6 +38,13 @@ public class ProductDomainService {
 
 	public ProductDetail assembleProductDetail(Product product, Brand brand) {
 		return ProductDetail.of(product, brand);
+	}
+
+	public Map<Long, Product> getProductsMap(List<Long> productIds) {
+		List<Product> products = productRepository.findAllByIdIn(productIds);
+
+		return products.stream()
+				.collect(Collectors.toMap(Product::getId, Function.identity()));
 	}
 
 }
