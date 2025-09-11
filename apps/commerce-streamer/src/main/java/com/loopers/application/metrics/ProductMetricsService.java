@@ -1,5 +1,6 @@
 package com.loopers.application.metrics;
 
+import com.loopers.application.ranking.RankingService;
 import com.loopers.domain.eventHandled.EventHandledDomainService;
 import com.loopers.domain.metrics.MetricType;
 import com.loopers.domain.metrics.ProductMetrics;
@@ -14,7 +15,9 @@ public class ProductMetricsService {
 
 	private final EventHandledDomainService eventHandledDomainService;
 	private final ProductMetricsDomainService productMetricsDomainService;
+	private final RankingService rankingService;
 
+	// TODO Refactor: MetricsFacade -> 1.isHandled() 2.saveMetrics() 3.updateRanking() 4.saveEventHandled()
 	@Transactional
 	public void handleMetrics(ProductMetricsCommand command) {
 		// 이벤트 중복 처리 확인
@@ -29,6 +32,9 @@ public class ProductMetricsService {
 
 		// ProductMetrics 저장
 		productMetricsDomainService.saveMetrics(productMetrics);
+
+		// 랭킹 처리
+		rankingService.updateRanking(command.ProductId(), MetricType.from(command.eventType()));
 
 		// 이벤트 핸들 처리
 		eventHandledDomainService.saveEventHandled(command.eventId());
