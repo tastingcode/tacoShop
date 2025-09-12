@@ -23,13 +23,9 @@ public class ProductLikeEventHandler {
 	private final ProductRepository productRepository;
 	private final ProductCacheRepository productCacheRepository;
 
-	@Retryable(
-			retryFor = ObjectOptimisticLockingFailureException.class,
-			maxAttempts = 5,
-			backoff = @Backoff(delay = 100))
 	@Transactional
 	public void updateLikeCount(ProductLikeEvent event) {
-		Product product = productDomainService.getProduct(event.productId());
+		Product product = productDomainService.getProductForUpdate(event.productId());
 
 		if (event.likeEventType() == LikeEventType.LIKE)
 			product.increaseLikeCount();

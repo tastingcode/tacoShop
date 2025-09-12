@@ -5,10 +5,7 @@ import com.loopers.application.order.OrderFacade;
 import com.loopers.application.order.OrderInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +14,7 @@ public class OrderV1ApiController implements OrderV1ApiSpec {
 
 	private final OrderFacade orderFacade;
 
+	@PostMapping
 	@Override
 	public ApiResponse<OrderV1Dto.OrderResponse> createOrder(@RequestHeader("X-USER-ID") String userId,
 											   @RequestBody OrderV1Dto.OrderRequest orderRequest) {

@@ -2,6 +2,7 @@ package com.loopers.domain.metrics;
 
 public enum MetricType {
 	PRODUCT_LIKE("ProductLikeEvent"),
+	PRODUCT_UNLIKE("ProductUnlikeEvent"),
 	PRODUCT_VIEWED("ProductViewedEvent"),
 	PRODUCT_SALES("PaymentOrderSuccessEvent");
 

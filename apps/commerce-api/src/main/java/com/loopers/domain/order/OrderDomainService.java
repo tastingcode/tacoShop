@@ -2,11 +2,12 @@ package com.loopers.domain.order;
 
 
 import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.product.ProductDomainService;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +18,8 @@ import java.util.List;
 public class OrderDomainService {
 
 	private final OrderRepository orderRepository;
-	private final ProductRepository productRepository;
 	private final OrderProductRepository orderProductRepository;
+	private final ProductDomainService productDomainService;
 
 	@Transactional
 	public Order createOrder(UserEntity user, List<OrderProduct> orderProducts, int orderPrice, int discountAmount, Long couponId) {
@@ -29,8 +30,7 @@ public class OrderDomainService {
 	@Transactional
 	public void deductStocks(List<OrderProduct> orderProducts) {
 		orderProducts.forEach(orderProduct -> {
-			Product product = productRepository.findByIdForUpdate(orderProduct.getProductId())
-					.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. 상품 ID: "));
+			Product product = productDomainService.getProductForUpdate(orderProduct.getProductId());
 			product.deductStock(orderProduct.getQuantity());
 		});
 	}
@@ -38,8 +38,7 @@ public class OrderDomainService {
 	@Transactional
 	public void restoreStocks(List<OrderProduct> orderProducts) {
 		orderProducts.forEach(orderProduct -> {
-			Product product = productRepository.findByIdForUpdate(orderProduct.getProductId())
-					.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. 상품 ID: "));
+			Product product = productDomainService.getProductForUpdate(orderProduct.getProductId());
 			product.restoreStock(orderProduct.getQuantity());
 		});
 	}

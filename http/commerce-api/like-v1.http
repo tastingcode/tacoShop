@@ -1,0 +1,19 @@
+### 좋아요
+POST {{commerce-api}}/api/v1/likes
+X-USER-ID: user000001
+Content-Type: application/json
+
+{
+  "productId": 1
+}
+
+### 좋아요 취소
+DELETE {{commerce-api}}/api/v1/likes
+X-USER-ID: user000001
+Content-Type: application/json
+
+{
+  "productId": 1
+}
+
+

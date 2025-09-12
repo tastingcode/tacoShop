@@ -36,10 +36,10 @@ public class DataPlatformAdapter implements DataPlatformPort {
 					event.orderId(),
 					event.paymentId());
 
-			return DataPlatformDto.Result.success(Long.valueOf(event.userId()), "주문 결과 정보 전송 성공");
+			return DataPlatformDto.Result.success(event.userId(), "주문 결과 정보 전송 성공");
 		} catch (Exception e) {
 			log.error("[데이터 플랫폼] 주문 결과 정보 전송 실패: {}", e.getMessage());
-			return DataPlatformDto.Result.fail(Long.valueOf(event.userId()), "주문 결과 정보 전송 실패");
+			return DataPlatformDto.Result.fail(event.userId(), "주문 결과 정보 전송 실패");
 		}
 	}
 
@@ -51,10 +51,10 @@ public class DataPlatformAdapter implements DataPlatformPort {
 					event.orderId(),
 					event.paymentId());
 
-			return DataPlatformDto.Result.success(Long.valueOf(event.userId()), "결제-주문 결과 정보 전송 성공");
+			return DataPlatformDto.Result.success(event.userId(), "결제-주문 결과 정보 전송 성공");
 		} catch (Exception e) {
 			log.error("[데이터 플랫폼] 결제-주문 결과 정보 전송 실패: {}", e.getMessage());
-			return DataPlatformDto.Result.fail(Long.valueOf(event.userId()), "결제-주문 결과 정보 전송 실패");
+			return DataPlatformDto.Result.fail(event.userId(), "결제-주문 결과 정보 전송 실패");
 		}
 	}
 }
