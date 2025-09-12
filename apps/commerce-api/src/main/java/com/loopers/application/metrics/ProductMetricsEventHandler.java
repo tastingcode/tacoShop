@@ -27,7 +27,8 @@ public class ProductMetricsEventHandler {
 
 	public void handleLikeMetrics(ProductLikeEvent event){
 		int delta = event.likeEventType().equals(LikeEventType.LIKE) ? 1 : -1;
-		ProductMetricsCommand productMetricsCommand = ProductMetricsCommand.of(event.eventId(), event.productId(), event.getEventType(), delta);
+		String eventType = event.likeEventType().equals(LikeEventType.LIKE) ? "ProductLikeEvent" : "ProductUnlikeEvent";
+		ProductMetricsCommand productMetricsCommand = ProductMetricsCommand.of(event.eventId(), event.productId(), eventType, delta);
 
 		sendMetrics(productMetricsCommand);
 	}

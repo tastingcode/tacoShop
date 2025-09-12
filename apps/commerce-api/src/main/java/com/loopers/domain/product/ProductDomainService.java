@@ -25,6 +25,11 @@ public class ProductDomainService {
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 	}
 
+	public Product getProductForUpdate(Long productId){
+		return productRepository.findByIdForUpdate(productId)
+				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. 상품 ID: "));
+	}
+
 	public Page<ProductDetail> getProductsByQuery(ProductQuery productQuery) {
 		return productRepository.findProductsWithBrand(productQuery);
 	}

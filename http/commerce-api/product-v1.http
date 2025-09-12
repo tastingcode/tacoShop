@@ -1,0 +1,11 @@
+
+### 상품 목록 조회 (기본)
+GET {{commerce-api}}/api/v1/products
+
+### 상품 목록 조회 (request)
+GET {{commerce-api}}/api/v1/products?brandId=1&productSortType=LIKES_DESC&page=0&size=10
+
+### 상품 상세 조회 (2번 이상 조회 시 랭킹 포함)
+GET {{commerce-api}}/api/v1/products/15
+
+

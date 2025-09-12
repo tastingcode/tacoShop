@@ -1,0 +1,25 @@
+### 주문 요청
+POST {{commerce-api}}/api/v1/orders
+X-USER-ID: user000001
+Content-Type: application/json
+
+{
+    "orderProducts": [
+        {
+            "productId": 1,
+            "price": 10000,
+            "quantity": 1
+        },
+      {
+        "productId": 2,
+        "price": 10000,
+        "quantity": 1
+      },
+      {
+        "productId": 3,
+        "price": 10000,
+        "quantity": 1
+      }
+    ],
+    "couponId": 1
+}
