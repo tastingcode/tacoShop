@@ -39,4 +39,5 @@ public class ProductMetricsService {
 		// 이벤트 핸들 처리
 		eventHandledDomainService.saveEventHandled(command.eventId());
 	}
+
 }

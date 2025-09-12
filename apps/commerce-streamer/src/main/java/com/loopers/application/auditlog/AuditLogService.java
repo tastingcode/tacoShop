@@ -3,7 +3,7 @@ package com.loopers.application.auditlog;
 import com.loopers.domain.auditlog.AuditLog;
 import com.loopers.domain.auditlog.AuditLogRepository;
 import com.loopers.domain.eventHandled.EventHandled;
-import com.loopers.domain.eventHandled.EventHandledRepository;
+import com.loopers.domain.eventHandled.EventHandledDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,15 +16,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuditLogService {
 
-	private final EventHandledRepository eventHandledRepository;
+	private final EventHandledDomainService eventHandledDomainService;
 	private final AuditLogRepository auditLogRepository;
 
 	@Transactional
 	public void saveAuditLog(List<AuditLogCommand> commands) {
-		// 이벤트 핸들 ID 조회
-		Set<String> handledEventIds = eventHandledRepository.findEventIds(commands.stream()
+		// eventIds
+		Set<String> eventIdSet = commands.stream()
 				.map(AuditLogCommand::eventId)
-				.collect(Collectors.toSet()));
+				.collect(Collectors.toSet());
+
+		// 이벤트 핸들 ID 조회
+		Set<String> handledEventIds = eventHandledDomainService.getEventIds(eventIdSet);
 
 		// 이미 처리 된 이벤트 제외한 감사로그 생성
 		List<AuditLog> auditLogs = commands.stream()
@@ -41,6 +44,6 @@ public class AuditLogService {
 		auditLogRepository.saveAll(auditLogs);
 
 		// 이벤트 핸들 저장
-		eventHandledRepository.saveAll(eventHandleds);
+		eventHandledDomainService.saveEventHandledList(eventHandleds);
 	}
 }
