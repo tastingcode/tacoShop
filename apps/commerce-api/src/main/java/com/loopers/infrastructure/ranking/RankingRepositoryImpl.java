@@ -25,4 +25,9 @@ public class RankingRepositoryImpl implements RankingRepository {
 		return rank != null ? rank + 1 : null;
 	}
 
+	@Override
+	public Long findTotalCount(String rankingKey) {
+		return redisTemplate.opsForZSet().zCard(rankingKey);
+	}
+
 }

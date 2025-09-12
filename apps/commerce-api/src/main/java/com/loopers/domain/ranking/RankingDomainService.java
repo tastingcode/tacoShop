@@ -29,4 +29,8 @@ public class RankingDomainService {
 		return rankingRepository.getRank(rankingKey, productId);
 	}
 
+	public Long getTotalCountBy(String rankingKey){
+		return rankingRepository.findTotalCount(rankingKey);
+	}
+
 }

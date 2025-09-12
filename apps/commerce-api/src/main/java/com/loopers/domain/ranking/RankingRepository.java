@@ -7,4 +7,6 @@ public interface RankingRepository {
 	List<Long> getRankingProductIds(String rankingKey, long start, long end);
 
 	Long getRank(String rankingKey, Long productId);
+
+	Long findTotalCount(String rankingKey);
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public interface RankingV1ApiSpec {
 
 	@Operation(summary = "랭킹 목록 조회")
-	ApiResponse<List<RankingV1Dto.RankingResponse>> getRankingList(@RequestParam String date,
-																   @PageableDefault(page = 1, size = 20) Pageable pageable);
+	ApiResponse<RankingV1Dto.RankingListResponse> getRankingList(@RequestParam String date,
+																	   @PageableDefault(page = 1, size = 20) Pageable pageable);
 
 }

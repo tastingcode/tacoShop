@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.ranking;
 
 import com.loopers.application.ranking.RankingCommand;
-import com.loopers.application.ranking.RankingInfo;
+import com.loopers.application.ranking.RankingListInfo;
 import com.loopers.application.ranking.RankingService;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +24,14 @@ public class RankingController implements RankingV1ApiSpec {
 
     @GetMapping("")
     @Override
-    public ApiResponse<List<RankingV1Dto.RankingResponse>> getRankingList(
+    public ApiResponse<RankingV1Dto.RankingListResponse> getRankingList(
             @RequestParam (required = false) String date,
             @PageableDefault(page = 1, size = 20) Pageable pageable
     ) {
 		RankingCommand rankingCommand = RankingCommand.from(date, pageable.getPageNumber(), pageable.getPageSize());
-		List<RankingInfo> rankingInfos = rankingService.getRankingList(rankingCommand);
-		List<RankingV1Dto.RankingResponse> responses = RankingV1Dto.RankingResponse.from(rankingInfos);
-        return ApiResponse.success(responses);
+		RankingListInfo rankingListInfo = rankingService.getRankingList(rankingCommand);
+		RankingV1Dto.RankingListResponse response = RankingV1Dto.RankingListResponse.from(rankingListInfo);
+		return ApiResponse.success(response);
     }
 
 }

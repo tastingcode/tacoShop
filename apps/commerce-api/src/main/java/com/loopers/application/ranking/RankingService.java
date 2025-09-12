@@ -20,7 +20,7 @@ public class RankingService {
 	private final RankingAssembler rankingAssembler;
 
 
-	public List<RankingInfo> getRankingList(RankingCommand command) {
+	public RankingListInfo getRankingList(RankingCommand command) {
 		// 랭킹 키 조회
 		String dailyKey = rankingDomainService.getDailyKey(command.date());
 
@@ -33,7 +33,11 @@ public class RankingService {
 		// 랭킹 상품 조회
 		List<RankingInfo> rankingInfos = rankingAssembler.getRankingProducts(productIds, productsMap, command.start());
 
-		return rankingInfos;
+		// 토탈 카운트 조회
+		Long totalCount = rankingDomainService.getTotalCountBy(dailyKey);
+
+		// 랭킹 목록 정보
+		return RankingListInfo.from(rankingInfos, command.page(), command.size(), totalCount);
 	}
 
 }
