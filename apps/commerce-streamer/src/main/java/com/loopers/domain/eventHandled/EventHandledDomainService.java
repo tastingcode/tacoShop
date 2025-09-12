@@ -16,8 +16,8 @@ public class EventHandledDomainService {
 		return eventHandledRepository.existsByEventId(eventId);
 	}
 
-	public Set<String> getEventIds(Set<String> eventIdSet){
-		return eventHandledRepository.findEventIds(eventIdSet);
+	public Set<String> getEventSet(Set<String> eventIdSet){
+		return eventHandledRepository.findEventIdSet(eventIdSet);
 	}
 
 	public List<EventHandled> saveEventHandledList(List<EventHandled> eventHandledList) {

@@ -2,7 +2,6 @@ package com.loopers.interfaces.consumer.metrics;
 
 import com.loopers.application.metrics.MetricsFacade;
 import com.loopers.application.metrics.ProductMetricsCommand;
-import com.loopers.application.metrics.ProductMetricsService;
 import com.loopers.confg.kafka.KafkaConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductMetricsConsumer {
 
-	private final ProductMetricsService productMetricsService;
 	private final MetricsFacade metricsFacade;
-
-	/*@KafkaListener(
-			topics = "${kafka.topic.product-metrics}",
-			groupId = "${kafka.group.product-metrics-group-id}",
-			concurrency = "3"
-	)
-	public void consume(ProductMetricsDto productMetricsDto, Acknowledgment ack) {
-		ProductMetricsCommand command = productMetricsDto.toCommand();
-		productMetricsService.handleMetrics(command);
-		ack.acknowledge();
-	}*/
 
 	@KafkaListener(
 			topics = "${kafka.topic.product-metrics}",
@@ -41,7 +28,7 @@ public class ProductMetricsConsumer {
 				.map(ProductMetricsDto::toCommand)
 				.toList();
 
-		metricsFacade.handleMetrics(commands);
+		metricsFacade.processMetrics(commands);
 		ack.acknowledge();
 	}
 

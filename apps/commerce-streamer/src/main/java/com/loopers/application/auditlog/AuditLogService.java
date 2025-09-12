@@ -27,7 +27,7 @@ public class AuditLogService {
 				.collect(Collectors.toSet());
 
 		// 이벤트 핸들 ID 조회
-		Set<String> handledEventIds = eventHandledDomainService.getEventIds(eventIdSet);
+		Set<String> handledEventIds = eventHandledDomainService.getEventSet(eventIdSet);
 
 		// 이미 처리 된 이벤트 제외한 감사로그 생성
 		List<AuditLog> auditLogs = commands.stream()
