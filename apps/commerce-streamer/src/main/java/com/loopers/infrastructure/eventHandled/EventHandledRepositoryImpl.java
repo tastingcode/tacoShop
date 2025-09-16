@@ -26,7 +26,7 @@ public class EventHandledRepositoryImpl implements EventHandledRepository {
 	}
 
 	@Override
-	public Set<String> findEventIds(Set<String> eventIds) {
+	public Set<String> findEventIdSet(Set<String> eventIds) {
 		return eventHandledJpaRepository.findEventIdsByEventIdIn(eventIds).stream()
 				.map(EventHandled::getEventId)
 				.collect(Collectors.toSet());

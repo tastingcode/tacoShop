@@ -12,7 +12,8 @@ public record ProductDetail(Long productId, String productName, int price, int s
 				product.getLikeCount(),
 				brand != null ? brand.getId() : null,
 				brand != null ? brand.getName() : null,
-				brand != null ? brand.getDescription() : null);
+				brand != null ? brand.getDescription() : null
+				);
 	}
 
 }

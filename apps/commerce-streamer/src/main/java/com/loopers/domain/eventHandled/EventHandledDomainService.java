@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Set;
+
 @Component
 @RequiredArgsConstructor
 public class EventHandledDomainService {
@@ -11,6 +14,14 @@ public class EventHandledDomainService {
 
 	public boolean isHandled(String eventId) {
 		return eventHandledRepository.existsByEventId(eventId);
+	}
+
+	public Set<String> getEventSet(Set<String> eventIdSet){
+		return eventHandledRepository.findEventIdSet(eventIdSet);
+	}
+
+	public List<EventHandled> saveEventHandledList(List<EventHandled> eventHandledList) {
+		return eventHandledRepository.saveAll(eventHandledList);
 	}
 
 	@Transactional

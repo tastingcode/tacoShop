@@ -19,14 +19,14 @@ public class ProductMetricsDomainService {
 
 	public void updateMetricsDeltas(ProductMetrics productMetrics, MetricType metricType, int delta) {
 		switch (metricType) {
-			case PRODUCT_LIKE -> productMetrics.adjustLikesDelta(delta);
+			case PRODUCT_LIKE, PRODUCT_UNLIKE -> productMetrics.adjustLikesDelta(delta);
 			case PRODUCT_SALES -> productMetrics.increaseSalesDelta(delta);
 			case PRODUCT_VIEWED -> productMetrics.increaseViewsDelta(delta);
 		}
 	}
 
 	@Transactional
-	public void saveMetrics(ProductMetrics productMetrics){
-		productMetricsRepository.save(productMetrics);
+	public ProductMetrics saveMetrics(ProductMetrics productMetrics){
+		return productMetricsRepository.save(productMetrics);
 	}
 }

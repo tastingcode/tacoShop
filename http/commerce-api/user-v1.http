@@ -1,0 +1,14 @@
+### 회원 가입
+POST {{commerce-api}}/api/v1/users
+Content-Type: application/json
+
+{
+  "userId": "user000001",
+  "name": "user001",
+  "gender": "M",
+  "birth" : "2020-12-12",
+  "email": "user001@email.com"
+}
+
+### 회원 조회
+GET {{commerce-api}}/api/v1/users/user000001

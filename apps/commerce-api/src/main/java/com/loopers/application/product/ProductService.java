@@ -6,6 +6,7 @@ import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandDomainService;
 import com.loopers.domain.product.*;
 import com.loopers.domain.product.event.ProductViewedEvent;
+import com.loopers.domain.ranking.RankingDomainService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ProductService {
 	private final ProductCacheRepository productCacheRepository;
 	private final ObjectMapper objectMapper;
 	private final ApplicationEventPublisher eventPublisher;
+	private final RankingDomainService rankingDomainService;
 
 	@Transactional(readOnly = true)
 	public ProductListInfo getProductList(ProductQuery productQuery) {
@@ -66,12 +68,21 @@ public class ProductService {
 
 	@Transactional(readOnly = true)
 	public ProductInfo getProductDetail(Long productId) {
+		// 상품 조회
 		Product product = productDomainService.getProduct(productId);
+
+		// 브랜드 조회
 		Brand brand = brandDomainService.getBrand(product.getBrandId()).orElse(null);
 
+		// 상품 상세
 		ProductDetail productDetail = productDomainService.assembleProductDetail(product, brand);
+
+		// 랭킹 조회
+		Long rank = rankingDomainService.getRankBy(productId);
+
+		// 상품 조회 이벤트 발행
 		eventPublisher.publishEvent(ProductViewedEvent.of(productId));
 
-		return ProductInfo.from(productDetail);
+		return ProductInfo.from(productDetail).withRank(rank);
 	}
 }

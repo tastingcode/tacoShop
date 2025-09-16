@@ -27,8 +27,6 @@ public class Product extends BaseEntity {
 	@Column(name = "ref_brand_id", nullable = false)
 	private Long brandId;
 	private int likeCount;
-	@Version
-	private Long version;
 
 	@Builder
 	public Product (String name, int price, int stock, Long brandId, int likeCount) {
