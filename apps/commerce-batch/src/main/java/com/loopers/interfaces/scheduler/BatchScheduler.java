@@ -43,6 +43,24 @@ public class BatchScheduler {
 
 	}
 
+	/**
+	 * 매달 1일 새벽 3시에 월간 랭킹 배치
+	 */
+	@Scheduled(cron = "0 0 3 1 * *", zone = "Asia/Seoul")
+	public void executeMonthlyRankingJob(){
+		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+		YearMonth lastMonth = YearMonth.from(today).minusMonths(1);
 
+		try {
+			JobParameters jobParameters = new JobParametersBuilder()
+					.addString("yearMonth", lastMonth.toString())
+					.toJobParameters();
+
+			jobLauncher.run(monthlyRankingJob, jobParameters);
+		} catch (Exception e) {
+			log.error("월간 랭킹 배치 실패", e);
+		}
+
+	}
 
 }
