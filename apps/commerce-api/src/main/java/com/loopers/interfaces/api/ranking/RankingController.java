@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api.ranking;
 
 import com.loopers.application.ranking.RankingCommand;
+import com.loopers.application.ranking.RankingFacade;
 import com.loopers.application.ranking.RankingListInfo;
 import com.loopers.application.ranking.RankingService;
 import com.loopers.interfaces.api.ApiResponse;
@@ -20,18 +21,19 @@ import java.util.List;
 @RequestMapping("/api/v1/rankings")
 public class RankingController implements RankingV1ApiSpec {
 
-	private final RankingService rankingService;
+	private final RankingFacade rankingFacade;
 
-    @GetMapping("")
-    @Override
-    public ApiResponse<RankingV1Dto.RankingListResponse> getRankingList(
-            @RequestParam (required = false) String date,
-            @PageableDefault(page = 1, size = 20) Pageable pageable
-    ) {
-		RankingCommand rankingCommand = RankingCommand.from(date, pageable.getPageNumber(), pageable.getPageSize());
-		RankingListInfo rankingListInfo = rankingService.getRankingList(rankingCommand);
+	@GetMapping("")
+	@Override
+	public ApiResponse<RankingV1Dto.RankingListResponse> getRankingList(
+			@RequestParam(required = true) String date,
+			@RequestParam(required = false, defaultValue = "DAILY") String period,
+			@PageableDefault(page = 1, size = 20) Pageable pageable
+	) {
+		RankingCommand rankingCommand = RankingCommand.from(date, period, pageable.getPageNumber(), pageable.getPageSize());
+		RankingListInfo rankingListInfo = rankingFacade.getRankingList(rankingCommand);
 		RankingV1Dto.RankingListResponse response = RankingV1Dto.RankingListResponse.from(rankingListInfo);
 		return ApiResponse.success(response);
-    }
+	}
 
 }

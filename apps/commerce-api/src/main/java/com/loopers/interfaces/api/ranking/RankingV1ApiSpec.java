@@ -15,6 +15,7 @@ public interface RankingV1ApiSpec {
 
 	@Operation(summary = "랭킹 목록 조회")
 	ApiResponse<RankingV1Dto.RankingListResponse> getRankingList(@RequestParam String date,
-																	   @PageableDefault(page = 1, size = 20) Pageable pageable);
+																 @RequestParam String period,
+																 @PageableDefault(page = 1, size = 20) Pageable pageable);
 
 }
